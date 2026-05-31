@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNDF 변환기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>FNDF 변환기</h1>
+
+    <nav>
+        <button class="nav-btn active">사진 변환</button>
+        <button class="nav-btn" disabled>PDF 변환</button>
+        <button class="nav-btn" disabled>영상 변환</button>
+    </nav>
+</header>
+
+<main>
+    <div class="card">
+
+        <h2>이미지 변환</h2>
+
+        <input type="file" id="imageInput" accept="image/*">
+
+        <select id="formatSelect">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPG</option>
+            <option value="webp">WEBP</option>
+        </select>
+
+        <button id="convertBtn">
+            변환하기
+        </button>
+
+        <img id="preview" alt="미리보기">
+
+        <a id="downloadBtn" download>
+            다운로드
+        </a>
+
+    </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
