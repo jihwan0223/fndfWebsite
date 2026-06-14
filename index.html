@@ -1,49 +1,558 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>osu!mania → Chart Converter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --border: #2a2a30;
+    --accent: #c8f04d;
+    --accent-dim: rgba(200, 240, 77, 0.12);
+    --text: #e8e8ec;
+    --muted: #6b6b78;
+    --lane0: #ff6b6b;
+    --lane1: #ffd93d;
+    --lane2: #6bcb77;
+    --lane3: #4d96ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .lanes-icon {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+  }
+  .lanes-icon span {
+    width: 6px;
+    border-radius: 3px;
+    animation: pulse-bar 1.8s ease-in-out infinite;
+  }
+  .lanes-icon span:nth-child(1) { height: 18px; background: var(--lane0); animation-delay: 0s; }
+  .lanes-icon span:nth-child(2) { height: 26px; background: var(--lane1); animation-delay: 0.2s; }
+  .lanes-icon span:nth-child(3) { height: 22px; background: var(--lane2); animation-delay: 0.4s; }
+  .lanes-icon span:nth-child(4) { height: 30px; background: var(--lane3); animation-delay: 0.6s; }
+
+  @keyframes pulse-bar {
+    0%, 100% { opacity: 0.5; transform: scaleY(0.8); }
+    50% { opacity: 1; transform: scaleY(1); }
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Drop zone ── */
+  .dropzone {
+    width: 100%;
+    max-width: 600px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 56px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+
+  .dropzone:hover, .dropzone.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon {
+    font-size: 2.4rem;
+    margin-bottom: 14px;
+    line-height: 1;
+  }
+
+  .drop-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .drop-hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Stats bar ── */
+  .stats {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 24px;
+    display: none;
+    gap: 12px;
+  }
+
+  .stats.visible { display: flex; }
+
+  .stat-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  /* ── Lane breakdown ── */
+  .lane-breakdown {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 12px;
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .lane-breakdown.visible { display: flex; }
+
+  .lane-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .lane-bar-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .lane-tag {
+    width: 28px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .lane-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .lane-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .lane-count {
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  /* ── Output ── */
+  .output-section {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+    display: none;
+  }
+
+  .output-section.visible { display: block; }
+
+  .output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .output-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .btn-download {
+    background: var(--accent);
+    color: #0d0d0f;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-download:hover { opacity: 0.85; }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--text);
+    overflow-x: auto;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  /* ── Error ── */
+  .error-msg {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 16px;
+    background: rgba(255, 100, 100, 0.1);
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    color: #ff8080;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .error-msg.visible { display: block; }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.5rem; }
+    .dropzone { padding: 40px 20px; }
+    .stats { flex-wrap: wrap; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lanes-icon span { animation: none; opacity: 1; transform: none; }
+  }
+</style>
 </head>
 <body>
 
 <header>
-    <h1>test</h1>
-
-    <nav>
-        <button class="nav-btn active">사진 변환</button>
-        <button class="nav-btn" disabled>PDF 변환</button>
-        <button class="nav-btn" disabled>영상 변환</button>
-    </nav>
+  <div class="logo-row">
+    <div class="lanes-icon">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <h1>osu!mania <em>→</em> Chart</h1>
+  </div>
+  <p class="subtitle">4K · .osu 파일을 JSON 채보로 변환</p>
 </header>
 
-<main>
-    <div class="card">
+<div class="dropzone" id="dropzone">
+  <input type="file" accept=".osu" id="fileInput">
+  <div class="drop-icon">🎵</div>
+  <div class="drop-label">.osu 파일을 드래그하거나 클릭해서 선택</div>
+  <div class="drop-hint">osu!mania 4K 모드 전용</div>
+</div>
 
-        <h2>이미지 변환</h2>
+<div class="error-msg" id="errorMsg"></div>
 
-        <input type="file" id="imageInput" accept="image/*">
+<div class="stats" id="stats">
+  <div class="stat-card">
+    <div class="stat-value" id="statBpm">—</div>
+    <div class="stat-label">BPM</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" id="statNotes">—</div>
+    <div class="stat-label">총 노트</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" id="statLongs">—</div>
+    <div class="stat-label">롱노트</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" id="statDuration">—</div>
+    <div class="stat-label">길이</div>
+  </div>
+</div>
 
-        <select id="formatSelect">
-            <option value="png">PNG</option>
-            <option value="jpeg">JPG</option>
-            <option value="webp">WEBP</option>
-        </select>
+<div class="lane-breakdown" id="laneBreakdown">
+  <div class="lane-label-row"><span>레인별 분포</span></div>
+  <div class="lane-bar-row">
+    <div class="lane-tag" style="color:var(--lane0)">L1</div>
+    <div class="lane-bar-wrap"><div class="lane-bar-fill" id="bar0" style="background:var(--lane0);width:0%"></div></div>
+    <div class="lane-count" id="cnt0">0</div>
+  </div>
+  <div class="lane-bar-row">
+    <div class="lane-tag" style="color:var(--lane1)">L2</div>
+    <div class="lane-bar-wrap"><div class="lane-bar-fill" id="bar1" style="background:var(--lane1);width:0%"></div></div>
+    <div class="lane-count" id="cnt1">0</div>
+  </div>
+  <div class="lane-bar-row">
+    <div class="lane-tag" style="color:var(--lane2)">L3</div>
+    <div class="lane-bar-wrap"><div class="lane-bar-fill" id="bar2" style="background:var(--lane2);width:0%"></div></div>
+    <div class="lane-count" id="cnt2">0</div>
+  </div>
+  <div class="lane-bar-row">
+    <div class="lane-tag" style="color:var(--lane3)">L4</div>
+    <div class="lane-bar-wrap"><div class="lane-bar-fill" id="bar3" style="background:var(--lane3);width:0%"></div></div>
+    <div class="lane-count" id="cnt3">0</div>
+  </div>
+</div>
 
-        <button id="convertBtn">
-            변환하기
-        </button>
+<div class="output-section" id="outputSection">
+  <div class="output-header">
+    <div class="output-title">변환 결과 (JSON)</div>
+    <button class="btn-download" id="btnDownload">↓ 다운로드</button>
+  </div>
+  <pre id="outputPre"></pre>
+</div>
 
-        <img id="preview" alt="미리보기">
+<script>
+  let resultJson = null;
+  let outputFilename = 'chart.json';
 
-        <a id="downloadBtn" download>
-            다운로드
-        </a>
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = '⚠ ' + msg;
+    el.classList.add('visible');
+  }
 
-    </div>
-</main>
+  function clearError() {
+    document.getElementById('errorMsg').classList.remove('visible');
+  }
 
-<script src="script.js"></script>
+  function parseOsu(text, filename) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    let section = '';
+    let bpm = 0;
+    const timingPoints = [];
+    const notes = [];
+    let keyCount = 4;
+    let mode = -1;
+
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+
+      if (line.startsWith('[')) {
+        section = line;
+        continue;
+      }
+
+      if (section === '[General]' || section === '[Difficulty]' || section === '[Metadata]') {
+        const [key, ...rest] = line.split(':');
+        const val = rest.join(':').trim();
+        if (key.trim() === 'Mode') mode = parseInt(val);
+        if (key.trim() === 'CircleSize') keyCount = parseInt(val);
+      }
+
+      if (section === '[TimingPoints]') {
+        const parts = line.split(',');
+        if (parts.length < 2) continue;
+        const timeMs = parseFloat(parts[0]);
+        const beatLength = parseFloat(parts[1]);
+        if (beatLength > 0) {
+          const pointBpm = Math.round(60000 / beatLength);
+          if (timingPoints.length === 0) bpm = pointBpm;
+          timingPoints.push({ timeMs: Math.round(timeMs), bpm: pointBpm });
+        }
+      }
+
+      if (section === '[HitObjects]') {
+        const parts = line.split(',');
+        if (parts.length < 4) continue;
+        const x = parseInt(parts[0]);
+        const timeMs = parseInt(parts[2]);
+        const type = parseInt(parts[3]);
+
+        // 4키 기준 레인 (0~3)
+        const columnWidth = 512 / keyCount;
+        const lane = Math.min(Math.floor(x / columnWidth), keyCount - 1);
+
+        let noteType = 0;
+        let endTimeMs = 0;
+
+        if (type & 128) {
+          noteType = 1;
+          endTimeMs = parseInt(parts[5]?.split(':')[0] ?? '0');
+        }
+
+        notes.push({ timeMs, lane, type: noteType, endTimeMs });
+      }
+    }
+
+    if (mode !== -1 && mode !== 3) {
+      throw new Error(`이 파일은 osu!mania 모드가 아닙니다 (Mode: ${mode}). mania .osu 파일을 올려주세요.`);
+    }
+
+    if (notes.length === 0) {
+      throw new Error('노트를 찾을 수 없습니다. osu!mania 4K 파일인지 확인해주세요.');
+    }
+
+    notes.sort((a, b) => a.timeMs - b.timeMs);
+
+    return { bpm, timingPoints, notes };
+  }
+
+  function updateUI(result, filename) {
+    clearError();
+
+    const totalNotes = result.notes.length;
+    const longNotes = result.notes.filter(n => n.type === 1).length;
+    const lastNote = result.notes[result.notes.length - 1];
+    const durationSec = Math.ceil((lastNote.timeMs + (lastNote.endTimeMs || 0)) / 1000);
+    const mins = Math.floor(durationSec / 60);
+    const secs = durationSec % 60;
+
+    document.getElementById('statBpm').textContent = result.bpm;
+    document.getElementById('statNotes').textContent = totalNotes.toLocaleString();
+    document.getElementById('statLongs').textContent = longNotes.toLocaleString();
+    document.getElementById('statDuration').textContent = `${mins}:${String(secs).padStart(2,'0')}`;
+    document.getElementById('stats').classList.add('visible');
+
+    // 레인 분포
+    const laneCounts = [0, 0, 0, 0];
+    result.notes.forEach(n => { if (n.lane >= 0 && n.lane <= 3) laneCounts[n.lane]++; });
+    const maxLane = Math.max(...laneCounts, 1);
+    [0,1,2,3].forEach(i => {
+      document.getElementById(`bar${i}`).style.width = (laneCounts[i] / maxLane * 100) + '%';
+      document.getElementById(`cnt${i}`).textContent = laneCounts[i];
+    });
+    document.getElementById('laneBreakdown').classList.add('visible');
+
+    // JSON 출력
+    const json = JSON.stringify(result, null, 2);
+    const preview = json.length > 4000 ? json.slice(0, 4000) + '\n\n// ... (다운로드해서 전체 확인)' : json;
+    document.getElementById('outputPre').textContent = preview;
+    document.getElementById('outputSection').classList.add('visible');
+
+    const baseName = filename.replace(/\.osu$/i, '');
+    outputFilename = `${baseName}.json`;
+    resultJson = json;
+  }
+
+  function processFile(file) {
+    if (!file) return;
+    clearError();
+    ['stats','laneBreakdown','outputSection'].forEach(id =>
+      document.getElementById(id).classList.remove('visible')
+    );
+    resultJson = null;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const result = parseOsu(e.target.result, file.name);
+        updateUI(result, file.name);
+      } catch (err) {
+        showError(err.message);
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  // File input
+  document.getElementById('fileInput').addEventListener('change', e => {
+    if (e.target.files[0]) processFile(e.target.files[0]);
+  });
+
+  // Drag & drop
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  });
+
+  // Download
+  document.getElementById('btnDownload').addEventListener('click', () => {
+    if (!resultJson) return;
+    const blob = new Blob([resultJson], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = outputFilename;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
 </body>
 </html>
