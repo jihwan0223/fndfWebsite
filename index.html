@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>osu!mania → Chart Converter</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -36,11 +35,7 @@
     padding: 48px 24px 80px;
   }
 
-  /* ── Header ── */
-  header {
-    text-align: center;
-    margin-bottom: 56px;
-  }
+  header { text-align: center; margin-bottom: 56px; }
 
   .logo-row {
     display: flex;
@@ -50,16 +45,8 @@
     margin-bottom: 12px;
   }
 
-  .lanes-icon {
-    display: flex;
-    gap: 4px;
-    align-items: flex-end;
-  }
-  .lanes-icon span {
-    width: 6px;
-    border-radius: 3px;
-    animation: pulse-bar 1.8s ease-in-out infinite;
-  }
+  .lanes-icon { display: flex; gap: 4px; align-items: flex-end; }
+  .lanes-icon span { width: 6px; border-radius: 3px; animation: pulse-bar 1.8s ease-in-out infinite; }
   .lanes-icon span:nth-child(1) { height: 18px; background: var(--lane0); animation-delay: 0s; }
   .lanes-icon span:nth-child(2) { height: 26px; background: var(--lane1); animation-delay: 0.2s; }
   .lanes-icon span:nth-child(3) { height: 22px; background: var(--lane2); animation-delay: 0.4s; }
@@ -70,235 +57,73 @@
     50% { opacity: 1; transform: scaleY(1); }
   }
 
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
+  h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+  h1 em { font-style: normal; color: var(--accent); }
 
-  h1 em {
-    font-style: normal;
-    color: var(--accent);
-  }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
 
-  .subtitle {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-top: 6px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* ── Drop zone ── */
   .dropzone {
-    width: 100%;
-    max-width: 600px;
+    width: 100%; max-width: 600px;
     border: 2px dashed var(--border);
-    border-radius: 16px;
-    padding: 56px 32px;
-    text-align: center;
-    cursor: pointer;
+    border-radius: 16px; padding: 56px 32px;
+    text-align: center; cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
     position: relative;
   }
+  .dropzone:hover, .dropzone.drag-over { border-color: var(--accent); background: var(--accent-dim); }
+  .dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-icon { font-size: 2.4rem; margin-bottom: 14px; line-height: 1; }
+  .drop-label { font-size: 1rem; font-weight: 600; color: var(--text); }
+  .drop-hint { font-size: 0.8rem; color: var(--muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
 
-  .dropzone:hover, .dropzone.drag-over {
-    border-color: var(--accent);
-    background: var(--accent-dim);
-  }
-
-  .dropzone input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
-
-  .drop-icon {
-    font-size: 2.4rem;
-    margin-bottom: 14px;
-    line-height: 1;
-  }
-
-  .drop-label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .drop-hint {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-top: 6px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* ── Stats bar ── */
-  .stats {
-    width: 100%;
-    max-width: 600px;
-    margin-top: 24px;
-    display: none;
-    gap: 12px;
-  }
-
+  .stats { width: 100%; max-width: 600px; margin-top: 24px; display: none; gap: 12px; }
   .stats.visible { display: flex; }
+  .stat-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .stat-value { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+  .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
 
-  .stat-card {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    text-align: center;
-  }
-
-  .stat-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--accent);
-  }
-
-  .stat-label {
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 2px;
-  }
-
-  /* ── Lane breakdown ── */
   .lane-breakdown {
-    width: 100%;
-    max-width: 600px;
-    margin-top: 12px;
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    gap: 10px;
-    flex-direction: column;
+    width: 100%; max-width: 600px; margin-top: 12px; display: none;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px; gap: 10px; flex-direction: column;
   }
-
   .lane-breakdown.visible { display: flex; }
+  .lane-label-row { display: flex; justify-content: space-between; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); margin-bottom: 2px; }
+  .lane-bar-row { display: flex; gap: 8px; align-items: center; }
+  .lane-tag { width: 28px; font-size: 0.78rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .lane-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .lane-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .lane-count { font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); min-width: 28px; text-align: right; }
 
-  .lane-label-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.78rem;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-    margin-bottom: 2px;
-  }
-
-  .lane-bar-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .lane-tag {
-    width: 28px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-    flex-shrink: 0;
-  }
-
-  .lane-bar-wrap {
-    flex: 1;
-    height: 8px;
-    background: var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .lane-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  .lane-count {
-    font-size: 0.78rem;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-    min-width: 28px;
-    text-align: right;
-  }
-
-  /* ── Output ── */
-  .output-section {
-    width: 100%;
-    max-width: 600px;
-    margin-top: 20px;
-    display: none;
-  }
-
+  .output-section { width: 100%; max-width: 600px; margin-top: 20px; display: none; }
   .output-section.visible { display: block; }
+  .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .output-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
 
-  .output-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .output-title {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
+  .btn-row { display: flex; gap: 8px; }
   .btn-download {
-    background: var(--accent);
-    color: #0d0d0f;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    font-family: 'Space Grotesk', sans-serif;
-    cursor: pointer;
-    transition: opacity 0.15s;
+    background: var(--accent); color: #0d0d0f; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 0.85rem; font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif; cursor: pointer; transition: opacity 0.15s;
   }
-
   .btn-download:hover { opacity: 0.85; }
+  .btn-download.secondary {
+    background: transparent; color: var(--accent);
+    border: 1px solid var(--accent);
+  }
 
   pre {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem;
-    line-height: 1.6;
-    color: var(--text);
-    overflow-x: auto;
-    max-height: 320px;
-    overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    line-height: 1.6; color: var(--text); overflow-x: auto; max-height: 320px; overflow-y: auto;
   }
 
-  /* ── Error ── */
   .error-msg {
-    display: none;
-    width: 100%;
-    max-width: 600px;
-    margin-top: 16px;
-    background: rgba(255, 100, 100, 0.1);
-    border: 1px solid rgba(255, 100, 100, 0.3);
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 0.85rem;
-    color: #ff8080;
+    display: none; width: 100%; max-width: 600px; margin-top: 16px;
+    background: rgba(255, 100, 100, 0.1); border: 1px solid rgba(255, 100, 100, 0.3);
+    border-radius: 10px; padding: 14px 18px; font-size: 0.85rem; color: #ff8080;
     font-family: 'JetBrains Mono', monospace;
   }
-
   .error-msg.visible { display: block; }
 
   @media (max-width: 480px) {
@@ -306,7 +131,6 @@
     .dropzone { padding: 40px 20px; }
     .stats { flex-wrap: wrap; }
   }
-
   @media (prefers-reduced-motion: reduce) {
     .lanes-icon span { animation: none; opacity: 1; transform: none; }
   }
@@ -321,35 +145,23 @@
     </div>
     <h1>osu!mania <em>→</em> Chart</h1>
   </div>
-  <p class="subtitle">4K · .osu 파일을 JSON 채보로 변환</p>
+  <p class="subtitle">4K · .osu / .osz / .olz 파일을 JSON 채보로 변환</p>
 </header>
 
 <div class="dropzone" id="dropzone">
-  <input type="file" accept=".osu,.olz" id="fileInput">
+  <input type="file" accept=".osu,.osz,.olz" id="fileInput">
   <div class="drop-icon">🎵</div>
-  <div class="drop-label">.osu / .olz 파일을 드래그하거나 클릭해서 선택</div>
+  <div class="drop-label">.osu / .osz / .olz 파일을 드래그하거나 클릭해서 선택</div>
   <div class="drop-hint">osu!mania 4K 모드 전용</div>
 </div>
 
 <div class="error-msg" id="errorMsg"></div>
 
 <div class="stats" id="stats">
-  <div class="stat-card">
-    <div class="stat-value" id="statBpm">—</div>
-    <div class="stat-label">BPM</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value" id="statNotes">—</div>
-    <div class="stat-label">총 노트</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value" id="statLongs">—</div>
-    <div class="stat-label">롱노트</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value" id="statDuration">—</div>
-    <div class="stat-label">길이</div>
-  </div>
+  <div class="stat-card"><div class="stat-value" id="statBpm">—</div><div class="stat-label">BPM</div></div>
+  <div class="stat-card"><div class="stat-value" id="statNotes">—</div><div class="stat-label">총 노트</div></div>
+  <div class="stat-card"><div class="stat-value" id="statLongs">—</div><div class="stat-label">롱노트</div></div>
+  <div class="stat-card"><div class="stat-value" id="statDuration">—</div><div class="stat-label">길이</div></div>
 </div>
 
 <div class="lane-breakdown" id="laneBreakdown">
@@ -379,7 +191,10 @@
 <div class="output-section" id="outputSection">
   <div class="output-header">
     <div class="output-title">변환 결과 (JSON)</div>
-    <button class="btn-download" id="btnDownload">↓ 다운로드</button>
+    <div class="btn-row">
+      <button class="btn-download secondary" id="btnDownloadJson">↓ JSON</button>
+      <button class="btn-download" id="btnDownloadAll">↓ 전체 패키지 ZIP</button>
+    </div>
   </div>
   <pre id="outputPre"></pre>
 </div>
@@ -387,6 +202,7 @@
 <script>
   let resultJson = null;
   let outputFilename = 'chart.json';
+  let packageFiles = {}; // { filename: Uint8Array | string }
 
   function showError(msg) {
     const el = document.getElementById('errorMsg');
@@ -398,7 +214,7 @@
     document.getElementById('errorMsg').classList.remove('visible');
   }
 
-  function parseOsu(text, filename) {
+  function parseOsu(text) {
     const lines = text.replace(/^\uFEFF/, '').replace(/\r/g, '').split('\n');
     let section = '';
     let bpm = 0;
@@ -406,21 +222,20 @@
     const notes = [];
     let keyCount = 4;
     let mode = -1;
+    let audioFile = '';
 
     for (const raw of lines) {
       const line = raw.trim();
       if (!line) continue;
 
-      if (line.startsWith('[')) {
-        section = line;
-        continue;
-      }
+      if (line.startsWith('[')) { section = line; continue; }
 
-      if (section === '[General]' || section === '[Difficulty]' || section === '[Metadata]') {
+      if (section === '[General]' || section === '[Difficulty]') {
         const [key, ...rest] = line.split(':');
         const val = rest.join(':').trim();
         if (key.trim() === 'Mode') mode = parseInt(val);
         if (key.trim() === 'CircleSize') keyCount = parseInt(val);
+        if (key.trim() === 'AudioFilename') audioFile = val;
       }
 
       if (section === '[TimingPoints]') {
@@ -441,52 +256,44 @@
         const x = parseInt(parts[0]);
         const timeMs = parseInt(parts[2]);
         const type = parseInt(parts[3]);
-
-        // 4키 기준 레인 (0~3)
         const columnWidth = 512 / keyCount;
         const lane = Math.min(Math.floor(x / columnWidth), keyCount - 1);
-
-        let noteType = 0;
-        let endTimeMs = 0;
-
+        let noteType = 0, endTimeMs = 0;
         if (type & 128) {
           noteType = 1;
           endTimeMs = parseInt(parts[5]?.split(':')[0] ?? '0');
         }
-
         notes.push({ timeMs, lane, type: noteType, endTimeMs });
       }
     }
 
     if (notes.length === 0) {
       const hint = mode === -1 ? '(Mode 정보 없음)' : `(Mode: ${mode})`;
-      throw new Error(`[HitObjects] 섹션에서 노트를 찾을 수 없습니다 ${hint}. 파일 내용을 확인해주세요.`);
+      throw new Error(`[HitObjects] 섹션에서 노트를 찾을 수 없습니다 ${hint}.`);
     }
 
     notes.sort((a, b) => a.timeMs - b.timeMs);
-
-    return { bpm, timingPoints, notes };
+    return { chart: { bpm, timingPoints, notes }, audioFile };
   }
 
-  function updateUI(result, filename) {
+  function updateUI(result, baseName) {
     clearError();
-
-    const totalNotes = result.notes.length;
-    const longNotes = result.notes.filter(n => n.type === 1).length;
-    const lastNote = result.notes[result.notes.length - 1];
+    const { bpm, timingPoints, notes } = result;
+    const totalNotes = notes.length;
+    const longNotes = notes.filter(n => n.type === 1).length;
+    const lastNote = notes[notes.length - 1];
     const durationSec = Math.ceil((lastNote.timeMs + (lastNote.endTimeMs || 0)) / 1000);
     const mins = Math.floor(durationSec / 60);
     const secs = durationSec % 60;
 
-    document.getElementById('statBpm').textContent = result.bpm;
+    document.getElementById('statBpm').textContent = bpm;
     document.getElementById('statNotes').textContent = totalNotes.toLocaleString();
     document.getElementById('statLongs').textContent = longNotes.toLocaleString();
     document.getElementById('statDuration').textContent = `${mins}:${String(secs).padStart(2,'0')}`;
     document.getElementById('stats').classList.add('visible');
 
-    // 레인 분포
-    const laneCounts = [0, 0, 0, 0];
-    result.notes.forEach(n => { if (n.lane >= 0 && n.lane <= 3) laneCounts[n.lane]++; });
+    const laneCounts = [0,0,0,0];
+    notes.forEach(n => { if (n.lane >= 0 && n.lane <= 3) laneCounts[n.lane]++; });
     const maxLane = Math.max(...laneCounts, 1);
     [0,1,2,3].forEach(i => {
       document.getElementById(`bar${i}`).style.width = (laneCounts[i] / maxLane * 100) + '%';
@@ -494,54 +301,114 @@
     });
     document.getElementById('laneBreakdown').classList.add('visible');
 
-    // JSON 출력
-    const json = JSON.stringify(result, null, 2);
+    const json = JSON.stringify({ bpm, timingPoints, notes }, null, 2);
     const preview = json.length > 4000 ? json.slice(0, 4000) + '\n\n// ... (다운로드해서 전체 확인)' : json;
     document.getElementById('outputPre').textContent = preview;
     document.getElementById('outputSection').classList.add('visible');
 
-    const baseName = filename.replace(/\.osu$/i, '');
     outputFilename = `${baseName}.json`;
     resultJson = json;
+
+    // 패키지에 JSON 추가
+    packageFiles['chart.json'] = json;
+  }
+
+  // .osu 단일 파일 처리
+  function handleOsuText(text, baseName) {
+    const { chart, audioFile } = parseOsu(text);
+    packageFiles = {};
+    updateUI(chart, baseName);
+    // .osu만 올렸을 땐 오디오/이미지 없음
+    document.getElementById('btnDownloadAll').style.display = 'none';
+  }
+
+  // .osz / .olz (ZIP) 처리
+  async function handleZip(file) {
+    const zip = await JSZip.loadAsync(file);
+    const files = Object.values(zip.files);
+
+    // mania .osu 파일 찾기 (Mode:3 우선, 없으면 첫 번째 .osu)
+    let osuFile = null;
+    let osuText = '';
+    for (const f of files) {
+      if (!f.name.endsWith('.osu')) continue;
+      const text = await f.async('string');
+      if (/^Mode\s*:\s*3/m.test(text)) { osuFile = f; osuText = text; break; }
+      if (!osuFile) { osuFile = f; osuText = text; }
+    }
+    if (!osuFile) throw new Error('ZIP 안에 .osu 파일이 없습니다.');
+
+    const { chart, audioFile } = parseOsu(osuText);
+    const baseName = file.name.replace(/\.(osz|olz)$/i, '');
+
+    packageFiles = {};
+    updateUI(chart, baseName);
+
+    // 오디오 추출
+    const audioEntry = files.find(f => audioFile && f.name.toLowerCase() === audioFile.toLowerCase());
+    if (audioEntry) {
+      packageFiles['audio' + '.' + audioFile.split('.').pop()] = await audioEntry.async('uint8array');
+    }
+
+    // 이미지 추출 (jpg/png/jpeg)
+    const imgEntry = files.find(f => /\.(jpg|jpeg|png)$/i.test(f.name));
+    if (imgEntry) {
+      const ext = imgEntry.name.split('.').pop();
+      packageFiles[`cover.${ext}`] = await imgEntry.async('uint8array');
+    }
+
+    const hasExtra = Object.keys(packageFiles).length > 1;
+    document.getElementById('btnDownloadAll').style.display = hasExtra ? '' : 'none';
   }
 
   function processFile(file) {
     if (!file) return;
     clearError();
+    packageFiles = {};
+    resultJson = null;
     ['stats','laneBreakdown','outputSection'].forEach(id =>
       document.getElementById(id).classList.remove('visible')
     );
-    resultJson = null;
+    document.getElementById('btnDownloadAll').style.display = '';
 
     const ext = file.name.split('.').pop().toLowerCase();
 
-    if (ext === 'olz') {
-      JSZip.loadAsync(file).then(zip => {
-        const osuFile = Object.values(zip.files).find(f => f.name.endsWith('.osu'));
-        if (!osuFile) { showError('.olz 안에 .osu 파일이 없습니다.'); return null; }
-        return osuFile.async('string');
-      }).then(text => {
-        if (!text) return;
-        try {
-          const result = parseOsu(text, file.name);
-          updateUI(result, file.name);
-        } catch (err) {
-          showError(err.message);
-        }
-      }).catch(err => showError('파일 읽기 실패: ' + err.message));
+    if (ext === 'osz' || ext === 'olz') {
+      handleZip(file).catch(err => showError(err.message));
     } else {
       const reader = new FileReader();
       reader.onload = e => {
-        try {
-          const result = parseOsu(e.target.result, file.name);
-          updateUI(result, file.name);
-        } catch (err) {
-          showError(err.message);
-        }
+        try { handleOsuText(e.target.result, file.name.replace(/\.osu$/i, '')); }
+        catch (err) { showError(err.message); }
       };
       reader.readAsText(file, 'utf-8');
     }
   }
+
+  // JSON 단독 다운로드
+  document.getElementById('btnDownloadJson').addEventListener('click', () => {
+    if (!resultJson) return;
+    const blob = new Blob([resultJson], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = outputFilename; a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // 전체 패키지 ZIP 다운로드
+  document.getElementById('btnDownloadAll').addEventListener('click', async () => {
+    if (!resultJson) return;
+    const zip = new JSZip();
+    for (const [name, data] of Object.entries(packageFiles)) {
+      zip.file(name, data);
+    }
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = outputFilename.replace('.json', '') + '_package.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
 
   // File input
   document.getElementById('fileInput').addEventListener('change', e => {
@@ -557,18 +424,6 @@
     dz.classList.remove('drag-over');
     const file = e.dataTransfer.files[0];
     if (file) processFile(file);
-  });
-
-  // Download
-  document.getElementById('btnDownload').addEventListener('click', () => {
-    if (!resultJson) return;
-    const blob = new Blob([resultJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = outputFilename;
-    a.click();
-    URL.revokeObjectURL(url);
   });
 </script>
 </body>
