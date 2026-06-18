@@ -217,6 +217,7 @@
     <h1 id="mainTitle">osu!mania <em>→</em> MFRG</h1>
   </div>
   <p class="subtitle" id="mainSubtitle">4K · .osu / .osz / .olz 파일을 JSON 채보로 변환</p>
+  <p style="font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:4px;">v1.3.0</p>
 </header>
 
 <div class="tabs">
@@ -482,60 +483,75 @@ setupDropzone('dz-osu', 'fileInput-osu', processOsuFile);
 let adofaiResultJson = null, adofaiFilename = 'chart.json';
 
 function parseAdofai(text) {
-  // BOM, 제어 문자 제거 후 주석(//) 제거, 후행 쉼표 제거
-  const cleaned = text
-    .replace(/^\uFEFF/, '')
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
-    .replace(/\/\/[^\n]*/g, '')
-    .replace(/,\s*([}\]])/g, '$1');
+  // 1. URL 안의 //를 보호하며 주석 제거
+  function removeCommentsSafe(s) {
+    let result = [], inString = false, escape = false, i = 0;
+    while (i < s.length) {
+      const ch = s[i];
+      if (escape) { result.push(ch); escape = false; }
+      else if (inString && ch === '\\') { result.push(ch); escape = true; }
+      else if (ch === '"') { result.push(ch); inString = !inString; }
+      else if (!inString && ch === '/' && s[i+1] === '/') {
+        while (i < s.length && s[i] !== '\n') i++;
+        i++; continue;
+      } else { result.push(ch); }
+      i++;
+    }
+    return result.join('');
+  }
+
+  let cleaned = removeCommentsSafe(text);
+  // 후행 쉼표 제거
+  cleaned = cleaned.replace(/,(\s*[}\]])/g, '$1');
+  // 배열 내 객체 사이 누락 쉼표 추가: } { -> }, {
+  cleaned = cleaned.replace(/}(\s*\n\s*){/g, '},\$1{');
+
   let data;
-  try { data = JSON.parse(cleaned); } catch(e) { throw new Error('.adofai 파일 파싱 실패: ' + e.message); }
+  try { data = JSON.parse(cleaned); }
+  catch(e) { throw new Error('.adofai 파일 파싱 실패: ' + e.message); }
 
   const settings = data.settings || {};
   const baseBpm = parseFloat(settings.bpm) || 100;
   const offset = parseFloat(settings.offset) || 0;
-  const angleData = data.angleData || [];
 
-  if (angleData.length === 0) throw new Error('angleData가 비어있습니다.');
+  // angleData(신버전) 또는 pathData(구버전) 지원
+  let tileCount = 0;
+  if (data.angleData && data.angleData.length > 0) {
+    tileCount = data.angleData.length;
+  } else if (data.pathData && data.pathData.length > 0) {
+    tileCount = data.pathData.length;
+  } else {
+    throw new Error('angleData / pathData를 찾을 수 없습니다.');
+  }
 
   // BPM 변경 이벤트 수집
   const bpmEvents = [{ floor: 0, bpm: baseBpm }];
   (data.actions || []).forEach(action => {
     if (action.eventType === 'SetSpeed') {
+      const prevBpm = bpmEvents[bpmEvents.length - 1].bpm;
       const bpm = action.speedType === 'Multiplier'
-        ? bpmEvents[bpmEvents.length - 1].bpm * action.bpmMultiplier
-        : action.beatsPerMinute;
-      bpmEvents.push({ floor: action.floor, bpm });
+        ? prevBpm * (action.bpmMultiplier || 1)
+        : (action.beatsPerMinute || prevBpm);
+      bpmEvents.push({ floor: action.floor || 0, bpm });
     }
   });
 
   // 각 타일의 절대 시간 계산
   const notes = [];
-  let currentBpm = baseBpm;
-  let currentTimeMs = offset;
-  let bpmIdx = 0;
+  let currentBpm = baseBpm, currentTimeMs = offset, bpmIdx = 0;
 
-  for (let i = 0; i < angleData.length; i++) {
-    // BPM 이벤트 적용
+  for (let i = 0; i < tileCount; i++) {
     while (bpmIdx + 1 < bpmEvents.length && bpmEvents[bpmIdx + 1].floor <= i) {
       bpmIdx++;
       currentBpm = bpmEvents[bpmIdx].bpm;
     }
-
-    const angle = angleData[i];
-    if (angle !== 999) { // 999 = midspin (트윌 타일), 스킵
-      notes.push({ timeMs: Math.round(currentTimeMs), lane: 0, type: 0, endTimeMs: 0 });
-    }
-
-    const beatDuration = 60000 / currentBpm;
-    currentTimeMs += beatDuration;
+    notes.push({ timeMs: Math.round(currentTimeMs), lane: 0, type: 0, endTimeMs: 0 });
+    currentTimeMs += 60000 / currentBpm;
   }
 
   if (notes.length === 0) throw new Error('변환 가능한 노트가 없습니다.');
 
-  const lastTimeMs = notes[notes.length - 1].timeMs;
-  const durationSec = Math.ceil(lastTimeMs / 1000);
-
+  const durationSec = Math.ceil(notes[notes.length - 1].timeMs / 1000);
   return {
     chart: { bpm: Math.round(baseBpm), timingPoints: [{ timeMs: 0, bpm: Math.round(baseBpm) }], notes },
     durationSec
