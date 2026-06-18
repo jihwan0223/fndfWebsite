@@ -565,7 +565,13 @@ async function processAdofaiFile(file) {
   ['stats-adofai','out-adofai'].forEach(id => document.getElementById(id).classList.remove('visible'));
 
   try {
-    const text = await file.text();
+    // 인코딩 자동 감지: UTF-8 시도 후 실패시 CP949(한국어) 재시도
+    let text;
+    try {
+      const buf = await file.arrayBuffer();
+      try { text = new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+      catch { text = new TextDecoder('cp949').decode(buf); }
+    } catch { text = await file.text(); }
     const baseName = file.name.replace(/\.adofai$/i, '');
     const { chart, durationSec } = parseAdofai(text);
     adofaiUpdateUI(chart, durationSec, baseName);
