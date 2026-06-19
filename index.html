@@ -1,517 +1,1133 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chart Viewer · MFRG</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>→ MFRG Converter</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
 
-  :root {
-    --bg: #0d0d0f;
-    --surface: #16161a;
-    --border: #2a2a30;
-    --accent: #c8f04d;
-    --text: #e8e8ec;
-    --muted: #6b6b78;
-    --lane0: #ff6b6b;
-    --lane1: #ffd93d;
-    --lane2: #6bcb77;
-    --lane3: #4d96ff;
-    --track-w: 72px;
-    --note-h: 18px;
-    --fall-sec: 1.8;
-  }
+            :root {
+                --bg: #0d0d0f;
+                --surface: #16161a;
+                --border: #2a2a30;
+                --accent: #c8f04d;
+                --accent-dim: rgba(200, 240, 77, 0.12);
+                --text: #e8e8ec;
+                --muted: #6b6b78;
+                --lane0: #ff6b6b;
+                --lane1: #ffd93d;
+                --lane2: #6bcb77;
+                --lane3: #4d96ff;
+            }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
-  }
+            body {
+                background: var(--bg);
+                color: var(--text);
+                font-family: "Space Grotesk", sans-serif;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 48px 24px 80px;
+            }
 
-  /* ── Top bar ── */
-  .topbar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-    flex-shrink: 0;
-  }
+            header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
 
-  .title-area h2 {
-    font-size: 1rem;
-    font-weight: 700;
-  }
-  .title-area p {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
+            .logo-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 14px;
+                margin-bottom: 12px;
+            }
 
-  .controls { display: flex; gap: 8px; align-items: center; }
+            .lanes-icon {
+                display: flex;
+                gap: 4px;
+                align-items: flex-end;
+            }
+            .lanes-icon span {
+                width: 6px;
+                border-radius: 3px;
+                animation: pulse-bar 1.8s ease-in-out infinite;
+            }
+            .lanes-icon span:nth-child(1) {
+                height: 18px;
+                background: var(--lane0);
+                animation-delay: 0s;
+            }
+            .lanes-icon span:nth-child(2) {
+                height: 26px;
+                background: var(--lane1);
+                animation-delay: 0.2s;
+            }
+            .lanes-icon span:nth-child(3) {
+                height: 22px;
+                background: var(--lane2);
+                animation-delay: 0.4s;
+            }
+            .lanes-icon span:nth-child(4) {
+                height: 30px;
+                background: var(--lane3);
+                animation-delay: 0.6s;
+            }
 
-  .btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 8px;
-    padding: 7px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    font-family: 'Space Grotesk', sans-serif;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .btn:hover { border-color: var(--accent); }
-  .btn.primary { background: var(--accent); color: #0d0d0f; border-color: var(--accent); }
-  .btn.primary:hover { opacity: 0.85; }
+            @keyframes pulse-bar {
+                0%,
+                100% {
+                    opacity: 0.5;
+                    transform: scaleY(0.8);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scaleY(1);
+                }
+            }
 
-  .speed-label {
-    font-size: 0.78rem;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    white-space: nowrap;
-  }
+            h1 {
+                font-size: 2rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+            h1 em {
+                font-style: normal;
+                color: var(--accent);
+            }
+            .subtitle {
+                color: var(--muted);
+                font-size: 0.9rem;
+                margin-top: 6px;
+                font-family: "JetBrains Mono", monospace;
+            }
 
-  input[type=range] {
-    accent-color: var(--accent);
-    width: 80px;
-  }
+            /* ── Tabs ── */
+            .tabs {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 32px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 6px;
+            }
 
-  .file-btn {
-    position: relative;
-    overflow: hidden;
-  }
-  .file-btn input[type=file] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-  }
+            .tab-btn {
+                padding: 10px 22px;
+                border: none;
+                border-radius: 8px;
+                background: transparent;
+                color: var(--muted);
+                font-family: "Space Grotesk", sans-serif;
+                font-size: 0.9rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.15s, color 0.15s;
+                position: relative;
+            }
 
-  /* ── Progress ── */
-  .progress-wrap {
-    width: 100%;
-    height: 3px;
-    background: var(--border);
-    flex-shrink: 0;
-    cursor: pointer;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    width: 0%;
-    transition: width 0.1s linear;
-  }
+            .tab-btn:hover {
+                color: var(--text);
+            }
 
-  /* ── Stage ── */
-  .stage {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-  }
+            .tab-btn.active {
+                background: var(--accent);
+                color: #0d0d0f;
+            }
 
-  .track-wrap {
-    display: flex;
-    gap: 4px;
-    height: 100%;
-    position: relative;
-  }
+            .tab-btn.soon {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
 
-  .lane {
-    width: var(--track-w);
-    height: 100%;
-    position: relative;
-    background: rgba(255,255,255,0.02);
-    border-left: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    overflow: hidden;
-  }
+            .tab-btn.soon::after {
+                content: "soon";
+                position: absolute;
+                top: 4px;
+                right: 6px;
+                font-size: 0.55rem;
+                font-family: "JetBrains Mono", monospace;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
 
-  /* hit line */
-  .lane::after {
-    content: '';
-    position: absolute;
-    bottom: 80px;
-    left: 0; right: 0;
-    height: 3px;
-    border-radius: 2px;
-    z-index: 10;
-  }
-  .lane:nth-child(1)::after { background: var(--lane0); box-shadow: 0 0 8px var(--lane0); }
-  .lane:nth-child(2)::after { background: var(--lane1); box-shadow: 0 0 8px var(--lane1); }
-  .lane:nth-child(3)::after { background: var(--lane2); box-shadow: 0 0 8px var(--lane2); }
-  .lane:nth-child(4)::after { background: var(--lane3); box-shadow: 0 0 8px var(--lane3); }
+            /* ── Panel ── */
+            .panel {
+                display: none;
+                width: 100%;
+                max-width: 600px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .panel.active {
+                display: flex;
+            }
 
-  /* key indicator */
-  .key-indicator {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    border: 2px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    z-index: 20;
-    transition: background 0.06s;
-  }
-  .lane:nth-child(1) .key-indicator { border-color: var(--lane0); color: var(--lane0); }
-  .lane:nth-child(2) .key-indicator { border-color: var(--lane1); color: var(--lane1); }
-  .lane:nth-child(3) .key-indicator { border-color: var(--lane2); color: var(--lane2); }
-  .lane:nth-child(4) .key-indicator { border-color: var(--lane3); color: var(--lane3); }
-  .lane:nth-child(1) .key-indicator.hit { background: var(--lane0); color: #000; }
-  .lane:nth-child(2) .key-indicator.hit { background: var(--lane1); color: #000; }
-  .lane:nth-child(3) .key-indicator.hit { background: var(--lane2); color: #000; }
-  .lane:nth-child(4) .key-indicator.hit { background: var(--lane3); color: #000; }
+            /* ── Soon panel ── */
+            .soon-panel {
+                width: 100%;
+                max-width: 600px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 56px 32px;
+                text-align: center;
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+            .soon-panel.active {
+                display: flex;
+            }
+            .soon-icon {
+                font-size: 2.4rem;
+            }
+            .soon-title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--text);
+            }
+            .soon-desc {
+                font-size: 0.85rem;
+                color: var(--muted);
+                font-family: "JetBrains Mono", monospace;
+            }
 
-  /* ── Note elements ── */
-  .note {
-    position: absolute;
-    left: 6px;
-    right: 6px;
-    height: var(--note-h);
-    border-radius: 4px;
-    z-index: 5;
-    transform: translateY(0);
-  }
-  .lane:nth-child(1) .note { background: var(--lane0); box-shadow: 0 0 6px var(--lane0)44; }
-  .lane:nth-child(2) .note { background: var(--lane1); box-shadow: 0 0 6px var(--lane1)44; }
-  .lane:nth-child(3) .note { background: var(--lane2); box-shadow: 0 0 6px var(--lane2)44; }
-  .lane:nth-child(4) .note { background: var(--lane3); box-shadow: 0 0 6px var(--lane3)44; }
+            /* ── Dropzone ── */
+            .dropzone {
+                width: 100%;
+                border: 2px dashed var(--border);
+                border-radius: 16px;
+                padding: 56px 32px;
+                text-align: center;
+                cursor: pointer;
+                transition: border-color 0.2s, background 0.2s;
+                position: relative;
+            }
+            .dropzone:hover,
+            .dropzone.drag-over {
+                border-color: var(--accent);
+                background: var(--accent-dim);
+            }
+            .dropzone input[type="file"] {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                cursor: pointer;
+                width: 100%;
+                height: 100%;
+            }
+            .drop-icon {
+                font-size: 2.4rem;
+                margin-bottom: 14px;
+                line-height: 1;
+            }
+            .drop-label {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--text);
+            }
+            .drop-hint {
+                font-size: 0.8rem;
+                color: var(--muted);
+                margin-top: 6px;
+                font-family: "JetBrains Mono", monospace;
+            }
 
-  .note.long {
-    border-radius: 4px 4px 0 0;
-    opacity: 0.85;
-  }
-  .note.long-body {
-    border-radius: 0;
-    opacity: 0.4;
-  }
+            /* ── Stats ── */
+            .stats {
+                width: 100%;
+                margin-top: 24px;
+                display: none;
+                gap: 12px;
+            }
+            .stats.visible {
+                display: flex;
+            }
+            .stat-card {
+                flex: 1;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 14px 16px;
+                text-align: center;
+            }
+            .stat-value {
+                font-size: 1.4rem;
+                font-weight: 700;
+                font-family: "JetBrains Mono", monospace;
+                color: var(--accent);
+            }
+            .stat-label {
+                font-size: 0.72rem;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                margin-top: 2px;
+            }
 
-  /* ── Empty state ── */
-  .empty-state {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    color: var(--muted);
-    pointer-events: none;
-  }
-  .empty-state .icon { font-size: 2.5rem; }
-  .empty-state p { font-size: 0.9rem; font-family: 'JetBrains Mono', monospace; }
+            /* ── Lane breakdown ── */
+            .lane-breakdown {
+                width: 100%;
+                margin-top: 12px;
+                display: none;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 16px 20px;
+                gap: 10px;
+                flex-direction: column;
+            }
+            .lane-breakdown.visible {
+                display: flex;
+            }
+            .lane-label-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.78rem;
+                font-family: "JetBrains Mono", monospace;
+                color: var(--muted);
+                margin-bottom: 2px;
+            }
+            .lane-bar-row {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+            .lane-tag {
+                width: 28px;
+                font-size: 0.78rem;
+                font-weight: 600;
+                font-family: "JetBrains Mono", monospace;
+                flex-shrink: 0;
+            }
+            .lane-bar-wrap {
+                flex: 1;
+                height: 8px;
+                background: var(--border);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            .lane-bar-fill {
+                height: 100%;
+                border-radius: 4px;
+                transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+            .lane-count {
+                font-size: 0.78rem;
+                font-family: "JetBrains Mono", monospace;
+                color: var(--muted);
+                min-width: 28px;
+                text-align: right;
+            }
 
-  /* ── Stats overlay ── */
-  .stats-overlay {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 30;
-    pointer-events: none;
-  }
-  .stat-pill {
-    background: rgba(13,13,15,0.8);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 0.72rem;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-  }
-  .stat-pill span { color: var(--accent); }
+            /* ── Output ── */
+            .output-section {
+                width: 100%;
+                margin-top: 20px;
+                display: none;
+            }
+            .output-section.visible {
+                display: block;
+            }
+            .output-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .output-title {
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--muted);
+                font-family: "JetBrains Mono", monospace;
+            }
+            .btn-row {
+                display: flex;
+                gap: 8px;
+            }
+            .btn-download {
+                background: var(--accent);
+                color: #0d0d0f;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 18px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                font-family: "Space Grotesk", sans-serif;
+                cursor: pointer;
+                transition: opacity 0.15s;
+            }
+            .btn-download:hover {
+                opacity: 0.85;
+            }
+            .btn-download.secondary {
+                background: transparent;
+                color: var(--accent);
+                border: 1px solid var(--accent);
+            }
 
-  @media (max-width: 480px) {
-    :root { --track-w: 56px; }
-  }
-</style>
-</head>
-<body>
+            pre {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 20px;
+                font-family: "JetBrains Mono", monospace;
+                font-size: 0.78rem;
+                line-height: 1.6;
+                color: var(--text);
+                overflow-x: auto;
+                max-height: 320px;
+                overflow-y: auto;
+            }
 
-<div class="topbar">
-  <div class="title-area">
-    <h2 id="chartTitle">Chart Viewer</h2>
-    <p id="chartMeta">JSON 파일을 불러오세요</p>
-  </div>
-  <div class="controls">
-    <button class="btn file-btn">
-      📂 불러오기
-      <input type="file" accept=".json" id="fileInput">
-    </button>
-    <span class="speed-label">속도</span>
-    <input type="range" id="speedSlider" min="0.25" max="2" step="0.25" value="1">
-    <span class="speed-label" id="speedVal">1.0x</span>
-    <button class="btn primary" id="playBtn" disabled>▶ 재생</button>
-  </div>
-</div>
+            /* ── Error ── */
+            .error-msg {
+                display: none;
+                width: 100%;
+                margin-top: 16px;
+                background: rgba(255, 100, 100, 0.1);
+                border: 1px solid rgba(255, 100, 100, 0.3);
+                border-radius: 10px;
+                padding: 14px 18px;
+                font-size: 0.85rem;
+                color: #ff8080;
+                font-family: "JetBrains Mono", monospace;
+            }
+            .error-msg.visible {
+                display: block;
+            }
 
-<div class="progress-wrap" id="progressWrap">
-  <div class="progress-fill" id="progressFill"></div>
-</div>
+            @media (max-width: 480px) {
+                h1 {
+                    font-size: 1.5rem;
+                }
+                .dropzone {
+                    padding: 40px 20px;
+                }
+                .stats {
+                    flex-wrap: wrap;
+                }
+                .tabs {
+                    flex-wrap: wrap;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .lanes-icon span {
+                    animation: none;
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo-row">
+                <div class="lanes-icon">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <h1 id="mainTitle">osu!mania <em>→</em> MFRG</h1>
+            </div>
+            <p class="subtitle" id="mainSubtitle">
+                4K · .osu / .osz / .olz 파일을 JSON 채보로 변환
+            </p>
+            <p
+                style="
+                    font-size: 0.72rem;
+                    color: var(--muted);
+                    font-family: 'JetBrains Mono', monospace;
+                    margin-top: 4px;
+                "
+            >
+                v1.4.1
+            </p>
+        </header>
 
-<div class="stage" id="stage">
-  <div class="empty-state" id="emptyState">
-    <div class="icon">🎵</div>
-    <p>JSON 채보 파일을 불러오세요</p>
-  </div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="osu">osu!mania</button>
+            <button class="tab-btn" data-tab="adofai">얼불춤</button>
+            <button class="tab-btn soon" data-tab="djmax" disabled>
+                DJMAX
+            </button>
+        </div>
 
-  <div class="track-wrap" id="trackWrap" style="display:none">
-    <div class="lane" id="lane0"><div class="key-indicator" id="key0">D</div></div>
-    <div class="lane" id="lane1"><div class="key-indicator" id="key1">F</div></div>
-    <div class="lane" id="lane2"><div class="key-indicator" id="key2">J</div></div>
-    <div class="lane" id="lane3"><div class="key-indicator" id="key3">K</div></div>
-  </div>
+        <!-- osu panel -->
+        <div class="panel active" id="panel-osu">
+            <div class="dropzone" id="dz-osu">
+                <input type="file" accept=".osu,.osz,.olz" id="fileInput-osu" />
+                <div class="drop-icon">🎵</div>
+                <div class="drop-label">
+                    .osu / .osz / .olz 파일을 드래그하거나 클릭
+                </div>
+                <div class="drop-hint">osu!mania 4K 전용</div>
+            </div>
+            <div class="error-msg" id="error-osu"></div>
+            <div class="stats" id="stats-osu">
+                <div class="stat-card">
+                    <div class="stat-value" id="osu-bpm">—</div>
+                    <div class="stat-label">BPM</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="osu-notes">—</div>
+                    <div class="stat-label">총 노트</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="osu-longs">—</div>
+                    <div class="stat-label">롱노트</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="osu-dur">—</div>
+                    <div class="stat-label">길이</div>
+                </div>
+            </div>
+            <div class="lane-breakdown" id="lanes-osu">
+                <div class="lane-label-row"><span>레인별 분포</span></div>
+                <div class="lane-bar-row">
+                    <div class="lane-tag" style="color: var(--lane0)">L1</div>
+                    <div class="lane-bar-wrap">
+                        <div
+                            class="lane-bar-fill"
+                            id="osu-bar0"
+                            style="background: var(--lane0); width: 0%"
+                        ></div>
+                    </div>
+                    <div class="lane-count" id="osu-cnt0">0</div>
+                </div>
+                <div class="lane-bar-row">
+                    <div class="lane-tag" style="color: var(--lane1)">L2</div>
+                    <div class="lane-bar-wrap">
+                        <div
+                            class="lane-bar-fill"
+                            id="osu-bar1"
+                            style="background: var(--lane1); width: 0%"
+                        ></div>
+                    </div>
+                    <div class="lane-count" id="osu-cnt1">0</div>
+                </div>
+                <div class="lane-bar-row">
+                    <div class="lane-tag" style="color: var(--lane2)">L3</div>
+                    <div class="lane-bar-wrap">
+                        <div
+                            class="lane-bar-fill"
+                            id="osu-bar2"
+                            style="background: var(--lane2); width: 0%"
+                        ></div>
+                    </div>
+                    <div class="lane-count" id="osu-cnt2">0</div>
+                </div>
+                <div class="lane-bar-row">
+                    <div class="lane-tag" style="color: var(--lane3)">L4</div>
+                    <div class="lane-bar-wrap">
+                        <div
+                            class="lane-bar-fill"
+                            id="osu-bar3"
+                            style="background: var(--lane3); width: 0%"
+                        ></div>
+                    </div>
+                    <div class="lane-count" id="osu-cnt3">0</div>
+                </div>
+            </div>
+            <div class="output-section" id="out-osu">
+                <div class="output-header">
+                    <div class="output-title">변환 결과 (JSON)</div>
+                    <div class="btn-row">
+                        <button class="btn-download secondary" id="osu-dlJson">
+                            ↓ JSON
+                        </button>
+                        <button class="btn-download" id="osu-dlAll">
+                            ↓ 전체 패키지 ZIP
+                        </button>
+                    </div>
+                </div>
+                <pre id="osu-pre"></pre>
+            </div>
+        </div>
 
-  <div class="stats-overlay" id="statsOverlay" style="display:none">
-    <div class="stat-pill">BPM <span id="ovBpm">—</span></div>
-    <div class="stat-pill">노트 <span id="ovNotes">—</span></div>
-    <div class="stat-pill">시간 <span id="ovTime">0:00</span></div>
-  </div>
-</div>
+        <!-- adofai panel -->
+        <div class="panel" id="panel-adofai">
+            <div class="dropzone" id="dz-adofai">
+                <input type="file" accept=".adofai" id="fileInput-adofai" />
+                <div class="drop-icon">🔥</div>
+                <div class="drop-label">.adofai 파일을 드래그하거나 클릭</div>
+                <div class="drop-hint">단일 노트만 · 레인 0 고정</div>
+            </div>
+            <div class="error-msg" id="error-adofai"></div>
+            <div class="stats" id="stats-adofai">
+                <div class="stat-card">
+                    <div class="stat-value" id="adofai-bpm">—</div>
+                    <div class="stat-label">BPM</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="adofai-notes">—</div>
+                    <div class="stat-label">총 노트</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="adofai-dur">—</div>
+                    <div class="stat-label">길이</div>
+                </div>
+            </div>
+            <div class="output-section" id="out-adofai">
+                <div class="output-header">
+                    <div class="output-title">변환 결과 (JSON)</div>
+                    <div class="btn-row">
+                        <button class="btn-download" id="adofai-dlJson">
+                            ↓ JSON
+                        </button>
+                    </div>
+                </div>
+                <pre id="adofai-pre"></pre>
+            </div>
+        </div>
 
-<script>
-  let chartData = null;
-  let isPlaying = false;
-  let startTime = null;
-  let pausedAt = 0;
-  let animFrame = null;
-  let speed = 1.0;
-  let totalDuration = 0;
-  let noteElements = []; // { el, timeMs, laneEl, hit }
+        <!-- djmax panel -->
+        <div class="soon-panel" id="panel-djmax">
+            <div class="soon-icon">🎧</div>
+            <div class="soon-title">DJMAX → MFRG</div>
+            <div class="soon-desc">
+                추가 예정 · DJMAX Respect V .pt 포맷 지원
+            </div>
+        </div>
 
-  const HITLINE_FROM_BOTTOM = 80 + 9; // px, center of hitline
-  const FALL_MS = 1800; // how long a note takes to fall (at speed 1x)
+        <script>
+            // ── Tab switching ──
+            const tabTitles = {
+                osu: {
+                    title: "osu!mania <em>→</em> MFRG",
+                    sub: "4K · .osu / .osz / .olz 파일을 JSON 채보로 변환",
+                },
+                adofai: {
+                    title: "얼불춤 <em>→</em> MFRG",
+                    sub: ".adofai 파일을 JSON 채보로 변환",
+                },
+                djmax: { title: "DJMAX <em>→</em> MFRG", sub: "추가 예정" },
+            };
 
-  // ── File load ──
-  document.getElementById('fileInput').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        chartData = JSON.parse(ev.target.result);
-        loadChart(chartData, file.name.replace('.json',''));
-      } catch(err) {
-        alert('JSON 파싱 실패: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-  });
+            document.querySelectorAll(".tab-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    if (btn.classList.contains("soon")) return;
+                    document
+                        .querySelectorAll(".tab-btn")
+                        .forEach((b) => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    const tab = btn.dataset.tab;
+                    document
+                        .querySelectorAll(".panel, .soon-panel")
+                        .forEach((p) => p.classList.remove("active"));
+                    document
+                        .getElementById("panel-" + tab)
+                        .classList.add("active");
+                    document.getElementById("mainTitle").innerHTML =
+                        tabTitles[tab].title;
+                    document.getElementById("mainSubtitle").textContent =
+                        tabTitles[tab].sub;
+                });
+            });
 
-  // ── Speed slider ──
-  document.getElementById('speedSlider').addEventListener('input', e => {
-    speed = parseFloat(e.target.value);
-    document.getElementById('speedVal').textContent = speed.toFixed(2).replace(/\.?0+$/, '') + 'x';
-  });
+            // ── Shared helpers ──
+            function showError(id, msg) {
+                const el = document.getElementById("error-" + id);
+                el.textContent = "⚠ " + msg;
+                el.classList.add("visible");
+            }
+            function clearError(id) {
+                document
+                    .getElementById("error-" + id)
+                    .classList.remove("visible");
+            }
+            function setupDropzone(dzId, inputId, handler) {
+                const dz = document.getElementById(dzId);
+                document
+                    .getElementById(inputId)
+                    .addEventListener("change", (e) => {
+                        if (e.target.files[0]) handler(e.target.files[0]);
+                    });
+                dz.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                    dz.classList.add("drag-over");
+                });
+                dz.addEventListener("dragleave", () =>
+                    dz.classList.remove("drag-over")
+                );
+                dz.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    dz.classList.remove("drag-over");
+                    if (e.dataTransfer.files[0])
+                        handler(e.dataTransfer.files[0]);
+                });
+            }
+            function dlJson(json, filename) {
+                const blob = new Blob([json], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
 
-  // ── Play/Pause ──
-  document.getElementById('playBtn').addEventListener('click', () => {
-    if (!chartData) return;
-    if (isPlaying) {
-      pausePlayback();
-    } else {
-      startPlayback();
-    }
-  });
+            // ════════════════════════════════
+            // osu parser
+            // ════════════════════════════════
+            let osuResultJson = null,
+                osuFilename = "chart.json",
+                osuPackage = {};
 
-  // ── Progress bar seek ──
-  document.getElementById('progressWrap').addEventListener('click', e => {
-    if (!chartData) return;
-    const rect = e.target.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
-    pausedAt = ratio * totalDuration;
-    if (isPlaying) {
-      cancelAnimationFrame(animFrame);
-      startTime = performance.now() - pausedAt / speed;
-      animFrame = requestAnimationFrame(tick);
-    }
-    updateProgress(pausedAt);
-  });
+            function parseOsu(text) {
+                const lines = text
+                    .replace(/^\uFEFF/, "")
+                    .replace(/\r/g, "")
+                    .split("\n");
+                let section = "",
+                    bpm = 0,
+                    keyCount = 4,
+                    mode = -1,
+                    audioFile = "";
+                const timingPoints = [],
+                    notes = [];
 
-  function loadChart(data, title) {
-    stop();
-    clearNotes();
-    noteElements = [];
+                for (const raw of lines) {
+                    const line = raw.trim();
+                    if (!line) continue;
+                    if (line.startsWith("[")) {
+                        section = line;
+                        continue;
+                    }
 
-    document.getElementById('chartTitle').textContent = title;
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('trackWrap').style.display = 'flex';
-    document.getElementById('statsOverlay').style.display = 'flex';
-    document.getElementById('playBtn').disabled = false;
+                    if (section === "[General]" || section === "[Difficulty]") {
+                        const [key, ...rest] = line.split(":");
+                        const val = rest.join(":").trim();
+                        if (key.trim() === "Mode") mode = parseInt(val);
+                        if (key.trim() === "CircleSize")
+                            keyCount = parseInt(val);
+                        if (key.trim() === "AudioFilename") audioFile = val;
+                    }
 
-    const notes = data.notes || [];
-    totalDuration = notes.length > 0
-      ? Math.max(...notes.map(n => n.endTimeMs > 0 ? n.endTimeMs : n.timeMs)) + 2000
-      : 0;
+                    if (section === "[TimingPoints]") {
+                        const parts = line.split(",");
+                        if (parts.length < 2) continue;
+                        const timeMs = parseFloat(parts[0]);
+                        const beatLength = parseFloat(parts[1]);
+                        if (beatLength > 0) {
+                            const pointBpm = Math.round(60000 / beatLength);
+                            if (timingPoints.length === 0) bpm = pointBpm;
+                            timingPoints.push({
+                                timeMs: Math.round(timeMs),
+                                bpm: pointBpm,
+                            });
+                        }
+                    }
 
-    const mins = Math.floor(totalDuration / 60000);
-    const secs = Math.floor((totalDuration % 60000) / 1000);
-    document.getElementById('ovBpm').textContent = data.bpm || '—';
-    document.getElementById('ovNotes').textContent = notes.length.toLocaleString();
-    document.getElementById('chartMeta').textContent =
-      `${notes.length}노트 · ${data.bpm}BPM · ${mins}:${String(secs).padStart(2,'0')}`;
+                    if (section === "[HitObjects]") {
+                        const parts = line.split(",");
+                        if (parts.length < 4) continue;
+                        const x = parseInt(parts[0]);
+                        const timeMs = parseInt(parts[2]);
+                        const type = parseInt(parts[3]);
+                        const columnWidth = 512 / keyCount;
+                        const lane = Math.min(
+                            Math.floor(x / columnWidth),
+                            keyCount - 1
+                        );
+                        let noteType = 0,
+                            endTimeMs = 0;
+                        if (type & 128) {
+                            noteType = 1;
+                            endTimeMs = parseInt(
+                                parts[5]?.split(":")[0] ?? "0"
+                            );
+                        }
+                        notes.push({ timeMs, lane, type: noteType, endTimeMs });
+                    }
+                }
 
-    pausedAt = 0;
-    updateProgress(0);
-  }
+                if (notes.length === 0)
+                    throw new Error(`노트를 찾을 수 없습니다 (Mode: ${mode})`);
+                notes.sort((a, b) => a.timeMs - b.timeMs);
+                return { chart: { bpm, timingPoints, notes }, audioFile };
+            }
 
-  function getStageHeight() {
-    return document.getElementById('stage').clientHeight;
-  }
+            function osuUpdateUI(chart, baseName) {
+                const { bpm, timingPoints, notes } = chart;
+                const totalNotes = notes.length;
+                const longNotes = notes.filter((n) => n.type === 1).length;
+                const lastNote = notes[notes.length - 1];
+                const durationSec = Math.ceil(
+                    (lastNote.timeMs + (lastNote.endTimeMs || 0)) / 1000
+                );
+                const mins = Math.floor(durationSec / 60),
+                    secs = durationSec % 60;
 
-  // ── Note pool: create note el ──
-  function createNoteEl(note, stageH) {
-    const laneEl = document.getElementById('lane' + note.lane);
-    if (!laneEl) return null;
+                document.getElementById("osu-bpm").textContent = bpm;
+                document.getElementById("osu-notes").textContent =
+                    totalNotes.toLocaleString();
+                document.getElementById("osu-longs").textContent =
+                    longNotes.toLocaleString();
+                document.getElementById(
+                    "osu-dur"
+                ).textContent = `${mins}:${String(secs).padStart(2, "0")}`;
+                document.getElementById("stats-osu").classList.add("visible");
 
-    const el = document.createElement('div');
-    el.className = 'note';
-    laneEl.appendChild(el);
+                const laneCounts = [0, 0, 0, 0];
+                notes.forEach((n) => {
+                    if (n.lane >= 0 && n.lane <= 3) laneCounts[n.lane]++;
+                });
+                const maxLane = Math.max(...laneCounts, 1);
+                [0, 1, 2, 3].forEach((i) => {
+                    document.getElementById(`osu-bar${i}`).style.width =
+                        (laneCounts[i] / maxLane) * 100 + "%";
+                    document.getElementById(`osu-cnt${i}`).textContent =
+                        laneCounts[i];
+                });
+                document.getElementById("lanes-osu").classList.add("visible");
 
-    return { el, note, laneEl, hit: false };
-  }
+                const json = JSON.stringify(
+                    { bpm, timingPoints, notes },
+                    null,
+                    2
+                );
+                document.getElementById("osu-pre").textContent =
+                    json.length > 4000
+                        ? json.slice(0, 4000) + "\n// ..."
+                        : json;
+                document.getElementById("out-osu").classList.add("visible");
 
-  function clearNotes() {
-    [0,1,2,3].forEach(i => {
-      const lane = document.getElementById('lane' + i);
-      lane.querySelectorAll('.note').forEach(n => n.remove());
-    });
-  }
+                osuFilename = baseName + ".json";
+                osuResultJson = json;
+                osuPackage["chart.json"] = json;
+            }
 
-  // ── Playback ──
-  function startPlayback() {
-    isPlaying = true;
-    document.getElementById('playBtn').textContent = '⏸ 일시정지';
-    startTime = performance.now() - pausedAt / speed;
+            async function processOsuFile(file) {
+                clearError("osu");
+                osuResultJson = null;
+                osuPackage = {};
+                ["stats-osu", "lanes-osu", "out-osu"].forEach((id) =>
+                    document.getElementById(id).classList.remove("visible")
+                );
 
-    clearNotes();
-    noteElements = [];
-    const stageH = getStageHeight();
-    (chartData.notes || []).forEach(note => {
-      const obj = createNoteEl(note, stageH);
-      if (obj) {
-        obj.el.style.bottom = '-30px';
-        noteElements.push(obj);
-      }
-    });
+                const ext = file.name.split(".").pop().toLowerCase();
+                const baseName = file.name.replace(/\.(osu|osz|olz)$/i, "");
 
-    animFrame = requestAnimationFrame(tick);
-  }
+                try {
+                    if (ext === "osz" || ext === "olz") {
+                        const zip = await JSZip.loadAsync(file);
+                        const files = Object.values(zip.files);
+                        let osuFile = null,
+                            osuText = "";
+                        for (const f of files) {
+                            if (!f.name.endsWith(".osu")) continue;
+                            const text = await f.async("string");
+                            if (/^Mode\s*:\s*3/m.test(text)) {
+                                osuFile = f;
+                                osuText = text;
+                                break;
+                            }
+                            if (!osuFile) {
+                                osuFile = f;
+                                osuText = text;
+                            }
+                        }
+                        if (!osuFile)
+                            throw new Error("ZIP 안에 .osu 파일이 없습니다.");
+                        const { chart, audioFile } = parseOsu(osuText);
+                        osuUpdateUI(chart, baseName);
 
-  function pausePlayback() {
-    isPlaying = false;
-    pausedAt = (performance.now() - startTime) * speed;
-    cancelAnimationFrame(animFrame);
-    document.getElementById('playBtn').textContent = '▶ 재생';
-  }
+                        const audioEntry = files.find(
+                            (f) =>
+                                audioFile &&
+                                f.name.toLowerCase() === audioFile.toLowerCase()
+                        );
+                        if (audioEntry)
+                            osuPackage["audio." + audioFile.split(".").pop()] =
+                                await audioEntry.async("uint8array");
+                        const imgEntry = files.find((f) =>
+                            /\.(jpg|jpeg|png)$/i.test(f.name)
+                        );
+                        if (imgEntry)
+                            osuPackage[
+                                "cover." + imgEntry.name.split(".").pop()
+                            ] = await imgEntry.async("uint8array");
 
-  function stop() {
-    isPlaying = false;
-    pausedAt = 0;
-    cancelAnimationFrame(animFrame);
-    document.getElementById('playBtn').textContent = '▶ 재생';
-    if (chartData) document.getElementById('playBtn').disabled = false;
-  }
+                        document.getElementById("osu-dlAll").style.display =
+                            Object.keys(osuPackage).length > 1 ? "" : "none";
+                    } else {
+                        const text = await file.text();
+                        const { chart } = parseOsu(text);
+                        osuUpdateUI(chart, baseName);
+                        document.getElementById("osu-dlAll").style.display =
+                            "none";
+                    }
+                } catch (err) {
+                    showError("osu", err.message);
+                }
+            }
 
-  function tick(now) {
-    const elapsed = (now - startTime) * speed; // ms
-    const stageH = getStageHeight();
-    const hitlineY = HITLINE_FROM_BOTTOM; // from bottom in px
-    const fallMs = FALL_MS / speed; // adjusted fall time
+            document
+                .getElementById("osu-dlJson")
+                .addEventListener("click", () => {
+                    if (osuResultJson) dlJson(osuResultJson, osuFilename);
+                });
+            document
+                .getElementById("osu-dlAll")
+                .addEventListener("click", async () => {
+                    if (!osuResultJson) return;
+                    const zip = new JSZip();
+                    for (const [name, data] of Object.entries(osuPackage))
+                        zip.file(name, data);
+                    const blob = await zip.generateAsync({ type: "blob" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download =
+                        osuFilename.replace(".json", "") + "_package.zip";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            setupDropzone("dz-osu", "fileInput-osu", processOsuFile);
 
-    // update progress
-    updateProgress(elapsed);
-    document.getElementById('ovTime').textContent = formatTime(elapsed);
+            // ════════════════════════════════
+            // ADOFAI parser
+            // ════════════════════════════════
+            let adofaiResultJson = null,
+                adofaiFilename = "chart.json";
 
-    // update notes
-    noteElements.forEach(obj => {
-      const { el, note } = obj;
-      const diff = note.timeMs - elapsed; // ms until hit
+            function parseAdofai(text) {
+                // URL 안의 // 보호하며 주석 제거
+                function removeCommentsSafe(s) {
+                    let result = [],
+                        inString = false,
+                        escape = false,
+                        i = 0;
+                    while (i < s.length) {
+                        const ch = s[i];
+                        if (escape) {
+                            result.push(ch);
+                            escape = false;
+                        } else if (inString && ch === "\\") {
+                            result.push(ch);
+                            escape = true;
+                        } else if (ch === '"') {
+                            result.push(ch);
+                            inString = !inString;
+                        } else if (
+                            !inString &&
+                            ch === "/" &&
+                            s[i + 1] === "/"
+                        ) {
+                            while (i < s.length && s[i] !== "\n") i++;
+                            i++;
+                            continue;
+                        } else {
+                            result.push(ch);
+                        }
+                        i++;
+                    }
+                    return result.join("");
+                }
 
-      // position: diff=0 → hitlineY from bottom, diff=fallMs → top
-      const pxFromBottom = hitlineY + (diff / FALL_MS) * (stageH - hitlineY) * speed;
+                let cleaned = removeCommentsSafe(text);
+                cleaned = cleaned.replace(/,(\s*[}\]])/g, "$1");
+                cleaned = cleaned.replace(/}(\s*\n\s*){/g, "},\n$1{");
 
-      if (pxFromBottom < -40 || pxFromBottom > stageH + 40) {
-        el.style.visibility = 'hidden';
-      } else {
-        el.style.visibility = 'visible';
-        el.style.bottom = pxFromBottom + 'px';
+                let data;
+                try {
+                    data = JSON.parse(cleaned);
+                } catch (e) {
+                    throw new Error(".adofai 파일 파싱 실패: " + e.message);
+                }
 
-        // long note height
-        if (note.type === 1 && note.endTimeMs > 0) {
-          const lengthMs = note.endTimeMs - note.timeMs;
-          const lengthPx = (lengthMs / FALL_MS) * (stageH - hitlineY) * speed;
-          el.style.height = Math.max(18, lengthPx) + 'px';
-          el.classList.add('long');
-        }
-      }
-    });
+                const settings = data.settings || {};
+                const baseBpm = parseFloat(settings.bpm) || 100;
+                const offset = parseFloat(settings.offset) || 0;
 
-    if (elapsed >= totalDuration) {
-      stop();
-      clearNotes();
-      updateProgress(totalDuration);
-      return;
-    }
+                // pathData 방향문자 → 절대각도 매핑
+                const DIR_ANGLE = {
+                    R: 0,
+                    p: 15,
+                    J: 30,
+                    E: 45,
+                    T: 60,
+                    o: 75,
+                    U: 90,
+                    q: 105,
+                    G: 120,
+                    Q: 135,
+                    H: 150,
+                    W: 165,
+                    L: 180,
+                    x: 195,
+                    N: 210,
+                    Z: 225,
+                    F: 240,
+                    V: 255,
+                    D: 270,
+                    Y: 285,
+                    B: 300,
+                    C: 315,
+                    M: 330,
+                    A: 345,
+                };
 
-    animFrame = requestAnimationFrame(tick);
-  }
+                // angleData(신버전) 또는 pathData(구버전)
+                let angles = [];
+                if (data.angleData && data.angleData.length > 0) {
+                    angles = data.angleData.map((a) => (a === 999 ? null : a));
+                } else if (data.pathData && data.pathData.length > 0) {
+                    for (const ch of data.pathData) {
+                        if (ch === "!") angles.push(null); // midspin
+                        else if (DIR_ANGLE[ch] !== undefined)
+                            angles.push(DIR_ANGLE[ch]);
+                    }
+                } else {
+                    throw new Error("angleData / pathData를 찾을 수 없습니다.");
+                }
 
-  function updateProgress(elapsed) {
-    const pct = totalDuration > 0 ? Math.min(100, (elapsed / totalDuration) * 100) : 0;
-    document.getElementById('progressFill').style.width = pct + '%';
-  }
+                if (angles.length === 0)
+                    throw new Error("변환 가능한 타일이 없습니다.");
 
-  function formatTime(ms) {
-    const totalSec = Math.floor(ms / 1000);
-    const m = Math.floor(totalSec / 60);
-    const s = totalSec % 60;
-    return `${m}:${String(s).padStart(2,'0')}`;
-  }
+                // BPM 변경 이벤트
+                const bpmEvents = [{ floor: 0, bpm: baseBpm }];
+                (data.actions || []).forEach((action) => {
+                    if (action.eventType === "SetSpeed") {
+                        const prevBpm = bpmEvents[bpmEvents.length - 1].bpm;
+                        const bpm =
+                            action.speedType === "Multiplier"
+                                ? prevBpm * (action.bpmMultiplier || 1)
+                                : action.beatsPerMinute || prevBpm;
+                        bpmEvents.push({ floor: action.floor || 0, bpm });
+                    }
+                });
 
-  // ── Keyboard flash ──
-  const KEY_MAP = { 'd': 0, 'f': 1, 'j': 2, 'k': 3 };
-  document.addEventListener('keydown', e => {
-    const lane = KEY_MAP[e.key.toLowerCase()];
-    if (lane !== undefined) {
-      document.getElementById('key' + lane).classList.add('hit');
-    }
-    if (e.key === ' ') {
-      e.preventDefault();
-      document.getElementById('playBtn').click();
-    }
-  });
-  document.addEventListener('keyup', e => {
-    const lane = KEY_MAP[e.key.toLowerCase()];
-    if (lane !== undefined) {
-      document.getElementById('key' + lane).classList.remove('hit');
-    }
-  });
-</script>
-</body>
+                function getBpm(floor) {
+                    let bpm = baseBpm;
+                    for (const ev of bpmEvents) {
+                        if (ev.floor <= floor) bpm = ev.bpm;
+                    }
+                    return bpm;
+                }
+
+                // 타일별 절대 시간 계산 (호 각도 기반)
+                const notes = [];
+                let currentTimeMs = offset;
+
+                for (let i = 0; i < angles.length; i++) {
+                    const bpm = getBpm(i);
+                    const beatMs = 60000 / bpm;
+
+                    if (angles[i] !== null) {
+                        notes.push({
+                            timeMs: Math.round(currentTimeMs),
+                            lane: 0,
+                            type: 0,
+                            endTimeMs: 0,
+                        });
+                    }
+
+                    if (i + 1 < angles.length) {
+                        const curr = angles[i],
+                            nxt = angles[i + 1];
+                        let arc;
+                        if (curr === null || nxt === null) {
+                            arc = 180; // midspin = 반박자
+                        } else {
+                            const diff = ((nxt - curr + 180) % 360) - 180;
+                            arc = Math.abs(diff) || 360;
+                        }
+                        currentTimeMs += (arc / 180) * beatMs;
+                    }
+                }
+
+                if (notes.length === 0)
+                    throw new Error("변환 가능한 노트가 없습니다.");
+
+                const durationSec = Math.ceil(
+                    notes[notes.length - 1].timeMs / 1000
+                );
+                return {
+                    chart: {
+                        bpm: Math.round(baseBpm),
+                        timingPoints: [{ timeMs: 0, bpm: Math.round(baseBpm) }],
+                        notes,
+                    },
+                    durationSec,
+                };
+            }
+            function adofaiUpdateUI(chart, durationSec, baseName) {
+                const { bpm, notes } = chart;
+                const mins = Math.floor(durationSec / 60),
+                    secs = durationSec % 60;
+
+                document.getElementById("adofai-bpm").textContent = bpm;
+                document.getElementById("adofai-notes").textContent =
+                    notes.length.toLocaleString();
+                document.getElementById(
+                    "adofai-dur"
+                ).textContent = `${mins}:${String(secs).padStart(2, "0")}`;
+                document
+                    .getElementById("stats-adofai")
+                    .classList.add("visible");
+
+                const json = JSON.stringify(chart, null, 2);
+                document.getElementById("adofai-pre").textContent =
+                    json.length > 4000
+                        ? json.slice(0, 4000) + "\n// ..."
+                        : json;
+                document.getElementById("out-adofai").classList.add("visible");
+
+                adofaiFilename = baseName + ".json";
+                adofaiResultJson = json;
+            }
+
+            async function processAdofaiFile(file) {
+                clearError("adofai");
+                adofaiResultJson = null;
+                ["stats-adofai", "out-adofai"].forEach((id) =>
+                    document.getElementById(id).classList.remove("visible")
+                );
+
+                try {
+                    // 인코딩 자동 감지: UTF-8 시도 후 실패시 CP949(한국어) 재시도
+                    let text;
+                    try {
+                        const buf = await file.arrayBuffer();
+                        try {
+                            text = new TextDecoder("utf-8", {
+                                fatal: true,
+                            }).decode(buf);
+                        } catch {
+                            text = new TextDecoder("cp949").decode(buf);
+                        }
+                    } catch {
+                        text = await file.text();
+                    }
+                    const baseName = file.name.replace(/\.adofai$/i, "");
+                    const { chart, durationSec } = parseAdofai(text);
+                    adofaiUpdateUI(chart, durationSec, baseName);
+                } catch (err) {
+                    showError("adofai", err.message);
+                }
+            }
+
+            document
+                .getElementById("adofai-dlJson")
+                .addEventListener("click", () => {
+                    if (adofaiResultJson)
+                        dlJson(adofaiResultJson, adofaiFilename);
+                });
+            setupDropzone("dz-adofai", "fileInput-adofai", processAdofaiFile);
+        </script>
+    </body>
 </html>
