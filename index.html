@@ -453,7 +453,7 @@
                     margin-top: 4px;
                 "
             >
-                v1.4.0
+                v1.4.1
             </p>
         </header>
 
@@ -1065,6 +1065,32 @@
                     durationSec,
                 };
             }
+            function adofaiUpdateUI(chart, durationSec, baseName) {
+                const { bpm, notes } = chart;
+                const mins = Math.floor(durationSec / 60),
+                    secs = durationSec % 60;
+
+                document.getElementById("adofai-bpm").textContent = bpm;
+                document.getElementById("adofai-notes").textContent =
+                    notes.length.toLocaleString();
+                document.getElementById(
+                    "adofai-dur"
+                ).textContent = `${mins}:${String(secs).padStart(2, "0")}`;
+                document
+                    .getElementById("stats-adofai")
+                    .classList.add("visible");
+
+                const json = JSON.stringify(chart, null, 2);
+                document.getElementById("adofai-pre").textContent =
+                    json.length > 4000
+                        ? json.slice(0, 4000) + "\n// ..."
+                        : json;
+                document.getElementById("out-adofai").classList.add("visible");
+
+                adofaiFilename = baseName + ".json";
+                adofaiResultJson = json;
+            }
+
             async function processAdofaiFile(file) {
                 clearError("adofai");
                 adofaiResultJson = null;
