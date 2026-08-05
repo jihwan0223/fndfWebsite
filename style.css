@@ -1,0 +1,7 @@
+.profile-link{
+  color:inherit;
+  text-decoration:none;
+  border-bottom:1px solid var(--mint-dark);
+  transition:color 0.2s;
+}
+.profile-link:hover{color:var(--mint-dark);}
