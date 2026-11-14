@@ -51,13 +51,25 @@ function exitGame() {
 // ===== 게임 데이터 =====
 // 프로젝트 자리: 나중에 여기만 채우면 게임 모드에도 반영됨
 const spots = [
-  { name: 'PROJECT 01', desc: '프로젝트 설명이 들어갈 자리입니다.' },
-  { name: 'PROJECT 02', desc: '프로젝트 설명이 들어갈 자리입니다.' },
-  { name: 'PROJECT 03', desc: '프로젝트 설명이 들어갈 자리입니다.' },
+  {
+    name: 'BREAK THE WAX WORLD',
+    html: 'Unity · C#<br>왁스로 뒤덮인 오브젝트를 부수며 성장하는 도파민 클리커 게임.<br>' +
+          '<a href="https://github.com/jihwan0223/Break-The-World" target="_blank" rel="noopener">GitHub ↗</a>',
+  },
+  {
+    name: 'SENIOR PARTY',
+    html: 'Unity · C# · Plastic SCM<br>시니어를 위한 인지기능 향상 게임 — 다양한 인지 훈련 미니게임 수록.<br>' +
+          '<a href="https://github.com/jihwan0223/SeniorParty" target="_blank" rel="noopener">GitHub ↗</a>',
+  },
+  {
+    name: 'GAMBLE GAME',
+    html: 'Unity · C#<br>블랙잭에 AI를 연동해 상황별 다양한 대사를 출력하는 카드 게임.<br>' +
+          '<a href="https://github.com/jihwan0223/gamblegame_Unity" target="_blank" rel="noopener">GitHub ↗</a>',
+  },
   {
     name: 'CONTACT',
     html: '메일 보내기: <a href="mailto:jihwan5580@gmail.com">jihwan5580@gmail.com</a><br>' +
-          'GitHub: <a href="#" target="_blank" rel="noopener">github.com/아이디</a>',
+          'GitHub: <a href="https://github.com/jihwan0223" target="_blank" rel="noopener">github.com/jihwan0223</a>',
   },
 ];
 
