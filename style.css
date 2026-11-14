@@ -1,7 +1,217 @@
-.profile-link{
-  color:inherit;
-  text-decoration:none;
-  border-bottom:1px solid var(--mint-dark);
-  transition:color 0.2s;
+/* ===== 토큰 ===== */
+:root {
+  --bg: #0a0a0a;
+  --bg-2: #111111;
+  --fg: #e8e8e8;
+  --fg-dim: #8a8a8a;
+  --accent: #3dff8e;
+  --line: #262626;
 }
-.profile-link:hover{color:var(--mint-dark);}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  line-height: 1.6;
+}
+
+.mono { font-family: "JetBrains Mono", monospace; }
+.accent { color: var(--accent); }
+
+a { color: inherit; text-decoration: none; }
+
+/* ===== 상단 바 ===== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 16px 24px;
+  background: rgba(10, 10, 10, 0.92);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(4px);
+}
+
+.logo { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+
+.nav { display: flex; gap: 24px; font-size: 14px; color: var(--fg-dim); }
+.nav a:hover { color: var(--accent); }
+
+.play-toggle {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.play-toggle .dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: blink 1.4s steps(1) infinite;
+}
+.play-toggle:hover { background: var(--accent); color: var(--bg); }
+.play-toggle:hover .dot { background: var(--bg); }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 모바일: 게임 모드 없음 */
+@media (max-width: 767px) {
+  .play-toggle { display: none; }
+  .nav { gap: 14px; font-size: 13px; }
+}
+
+/* ===== Hero ===== */
+.hero {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 140px 24px 120px;
+}
+.hero-pre { font-size: 14px; margin-bottom: 12px; }
+.hero-title {
+  font-size: clamp(56px, 11vw, 120px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.hero-sub { margin-top: 20px; font-size: 18px; color: var(--fg-dim); }
+.hero-hint { margin-top: 48px; font-size: 12px; color: var(--fg-dim); }
+@media (max-width: 767px) { .hero-hint { display: none; } }
+
+/* ===== 섹션 공통 ===== */
+.section {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 72px 24px;
+  border-top: 1px solid var(--line);
+}
+.section-title {
+  font-size: 14px;
+  letter-spacing: 3px;
+  margin-bottom: 40px;
+  color: var(--fg-dim);
+}
+
+/* ===== Projects ===== */
+.project-list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+
+.project {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  background: var(--bg);
+  transition: background 0.1s;
+}
+.project:hover { background: var(--bg-2); }
+
+.project-thumb {
+  flex: 0 0 200px;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--fg-dim);
+  background:
+    repeating-linear-gradient(45deg, transparent 0 10px, #161616 10px 20px),
+    var(--bg-2);
+  border: 1px solid var(--line);
+}
+
+.project-body { flex: 1; min-width: 0; }
+.project-name { font-size: 18px; font-weight: 700; }
+.project-desc { margin-top: 6px; font-size: 14px; color: var(--fg-dim); }
+
+.tags { display: flex; gap: 8px; margin-top: 14px; }
+.tags span {
+  font-size: 11px;
+  padding: 3px 8px;
+  color: var(--fg-dim);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+
+@media (max-width: 600px) {
+  .project { flex-direction: column; }
+  .project-thumb { flex-basis: auto; width: 100%; }
+}
+
+/* ===== Skills ===== */
+.skills { display: flex; flex-direction: column; }
+.skill-row {
+  display: flex;
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.skill-row dt { flex: 0 0 120px; font-size: 13px; color: var(--accent); }
+.skill-row dd { font-size: 15px; }
+
+/* ===== About / Contact ===== */
+.about-text { max-width: 640px; font-size: 16px; color: var(--fg); }
+
+.contact-list { list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
+.contact-list .label { display: inline-block; width: 90px; color: var(--fg-dim); }
+.contact-list a { border-bottom: 1px solid var(--line); }
+.contact-list a:hover { color: var(--accent); border-color: var(--accent); }
+
+.footer {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+
+/* ===== 게임 모드 ===== */
+.game-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+#gameCanvas { display: block; width: 100%; height: 100%; }
+
+.game-hud {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+  font-size: 12px;
+  color: var(--fg-dim);
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  background: rgba(10, 10, 10, 0.85);
+}
+
+.game-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%);
+  width: min(520px, 90vw);
+  padding: 24px;
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid var(--accent);
+}
+.game-panel h3 { font-size: 16px; color: var(--accent); margin-bottom: 10px; }
+.game-panel p { font-size: 13px; color: var(--fg); }
+.game-panel a { color: var(--accent); border-bottom: 1px solid var(--accent); }
+.panel-close { margin-top: 16px; font-size: 11px; color: var(--fg-dim); }
