@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JIHWAN — 게임 개발자 포트폴리오</title>
+<title>정지환 — 게임 개발자 포트폴리오</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta name="description" content="플레이어가 기억할 순간을 만드는 게임 개발자 JIHWAN의 포트폴리오.">
-<meta property="og:title" content="JIHWAN — 게임 개발자 포트폴리오">
-<meta property="og:description" content="Unity · C# 게임 개발자 JIHWAN의 프로젝트와 트러블슈팅 기록.">
+<meta name="description" content="플레이어가 기억할 순간을 만드는 게임 개발자 정지환의 포트폴리오.">
+<meta property="og:title" content="정지환 — 게임 개발자 포트폴리오">
+<meta property="og:description" content="Unity · C# 게임 개발자 정지환의 프로젝트와 트러블슈팅 기록.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -16,35 +16,46 @@
 <body>
 
 <header class="topbar">
-  <a class="logo" href="#top">JIHWAN</a>
+  <a class="logo" href="#about">정지환</a>
   <nav class="nav">
     <a href="#about">소개</a>
-    <a href="#projects">프로젝트</a>
     <a href="#skills">기술 스택</a>
     <a href="#history">수상 · 경력</a>
-    <a href="#contact">연락처</a>
+    <a href="#projects">프로젝트</a>
   </nav>
-  <a class="btn btn-sm" href="pdf.html">PDF 포트폴리오</a>
 </header>
 
 <main>
-  <section class="hero" id="top">
-    <p class="hero-role">게임 개발자</p>
-    <h1 class="hero-title">안녕하세요,<br>게임 개발자 JIHWAN입니다.</h1>
-    <p class="hero-sub">플레이어가 기억할 순간을 만드는 게임을 만듭니다.</p>
-    <div class="hero-actions">
-      <a class="btn" href="pdf.html">포트폴리오 PDF</a>
-      <a class="btn btn-line" href="https://github.com/jihwan0223" target="_blank" rel="noopener">GitHub</a>
-      <a class="btn btn-line" href="mailto:jihwan5580@gmail.com">이메일</a>
+  <!-- 자기소개: 인사 · 소개 · 연락처 + 기술 스택 · 수상/경력 -->
+  <section class="intro" id="about">
+    <div class="intro-head">
+      <div>
+        <p class="hero-role">게임 개발자</p>
+        <h1 class="hero-title">안녕하세요,<br>정지환입니다.</h1>
+      </div>
+      <div>
+        <p class="hero-sub">플레이어가 기억할 순간을 만드는 게임을 만듭니다.</p>
+        <p class="about-text">
+          자기소개가 들어갈 자리입니다. 어떤 게임을 만들고 싶은지,
+          무엇을 중요하게 생각하는 개발자인지 두세 문장으로 적어 주세요.
+        </p>
+        <dl class="intro-contact">
+          <div><dt>이메일</dt><dd><a href="mailto:jihwan5580@gmail.com">jihwan5580@gmail.com</a></dd></div>
+          <div><dt>깃허브</dt><dd><a href="https://github.com/jihwan0223" target="_blank" rel="noopener">github.com/jihwan0223</a></dd></div>
+        </dl>
+      </div>
     </div>
-  </section>
 
-  <section class="section" id="about">
-    <h2 class="section-title">소개</h2>
-    <p class="about-text">
-      자기소개가 들어갈 자리입니다. 어떤 게임을 만들고 싶은지,
-      무엇을 중요하게 생각하는 개발자인지 한 문단으로 적어 주세요.
-    </p>
+    <div class="intro-grid">
+      <article class="card" id="skills">
+        <h2 class="card-title">기술 스택</h2>
+        <dl class="skills" id="skillList"></dl>
+      </article>
+      <article class="card" id="history">
+        <h2 class="card-title">수상 · 경력</h2>
+        <ol class="history" id="awardList"></ol>
+      </article>
+    </div>
   </section>
 
   <section class="section" id="projects">
@@ -53,26 +64,7 @@
     <div class="project-list" id="projectList"></div>
   </section>
 
-  <section class="section" id="skills">
-    <h2 class="section-title">기술 스택</h2>
-    <dl class="skills" id="skillList"></dl>
-  </section>
-
-  <section class="section" id="history">
-    <h2 class="section-title">수상 · 경력</h2>
-    <ol class="history" id="awardList"></ol>
-  </section>
-
-  <section class="section" id="contact">
-    <h2 class="section-title">연락처</h2>
-    <ul class="contact-list">
-      <li><span class="label">이메일</span><a href="mailto:jihwan5580@gmail.com">jihwan5580@gmail.com</a></li>
-      <li><span class="label">GitHub</span><a href="https://github.com/jihwan0223" target="_blank" rel="noopener">github.com/jihwan0223</a></li>
-      <li><span class="label">itch.io</span><a href="#" target="_blank" rel="noopener">아이디.itch.io</a></li>
-    </ul>
-  </section>
-
-  <footer class="footer">© 2026 JIHWAN</footer>
+  <footer class="footer">© 2026 정지환</footer>
 </main>
 
 <script src="projects.js"></script>

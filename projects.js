@@ -116,7 +116,7 @@ const PROJECTS = [
 
 // 프로필 — 메인 페이지 Skills/History 섹션과 PDF 첫 장이 여기서 읽음
 const PROFILE = {
-  name: 'JIHWAN',
+  name: '정지환',
   role: '게임 개발자',
   tagline: '플레이어가 기억할 순간을 만드는 게임 개발자.',
   email: 'jihwan5580@gmail.com',
@@ -161,7 +161,7 @@ function buildDeck() {
           <p class="pg-lead">${PROFILE.tagline}</p>
           <dl class="pg-contact">
             <div><dt>이메일</dt><dd>${PROFILE.email}</dd></div>
-            <div><dt>GitHub</dt><dd>${PROFILE.github.replace('https://', '')}</dd></div>
+            <div><dt>깃허브</dt><dd>${PROFILE.github.replace('https://', '')}</dd></div>
           </dl>
         </div>
         <div class="pg-col">
