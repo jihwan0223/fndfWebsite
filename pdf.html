@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JIHWAN — Portfolio PDF</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html">JIHWAN<span class="accent">_</span></a>
+  <nav class="nav">
+    <a href="index.html">← 웹사이트</a>
+  </nav>
+</header>
+
+<main class="deck">
+  <div class="deck-bar">
+    <span>A4 가로 · 인쇄 창에서 대상을 "PDF로 저장", 여백 "없음", "배경 그래픽" 체크</span>
+    <button class="btn" onclick="print()">PDF로 저장</button>
+  </div>
+  <div id="pages" style="display: contents"></div>
+</main>
+
+<script src="projects.js"></script>
+<script>
+  document.getElementById('pages').innerHTML = renderDeck();
+</script>
+</body>
+</html>

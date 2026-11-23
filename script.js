@@ -14,6 +14,29 @@
   }, 70);
 })();
 
+// ===== 프로젝트 카드 =====
+document.getElementById('projectList').innerHTML = PROJECTS.map((p) => `
+  <a class="project" href="project.html?id=${p.id}">
+    ${imgSlot(p.id, 'thumb.png', `${p.title} 썸네일`, 'project-thumb')}
+    <div class="project-body">
+      <h3 class="project-name">${p.title}</h3>
+      ${p.award ? `<p class="award mono">★ ${p.award}</p>` : ''}
+      <p class="project-desc">${p.tagline}</p>
+      ${tagList(p.tags)}
+      <p class="project-more mono">트러블슈팅 ${p.troubles.length}건 · 자세히 보기 →</p>
+    </div>
+  </a>`).join('');
+
+// ===== 스킬 / 수상 =====
+document.getElementById('skillList').innerHTML = PROFILE.skills.map(([g, items]) => `
+  <div class="skill-row"><dt>${g}</dt><dd>${chipList(items)}</dd></div>`).join('');
+
+document.getElementById('awardList').innerHTML = PROFILE.awards.map((a) => `
+  <li class="history-row">
+    <span class="history-date">${a.date}</span>
+    <div class="history-body"><h3 class="history-name">${a.name}</h3><p class="history-desc">${a.desc}</p></div>
+  </li>`).join('');
+
 // ===== 모드 전환 =====
 const siteMode = document.getElementById('siteMode');
 const gameMode = document.getElementById('gameMode');
@@ -49,23 +72,12 @@ function exitGame() {
 }
 
 // ===== 게임 데이터 =====
-// 프로젝트 자리: 나중에 여기만 채우면 게임 모드에도 반영됨
 const spots = [
-  {
-    name: 'BREAK THE WAX WORLD',
-    html: 'Unity · C#<br>왁스로 뒤덮인 오브젝트를 부수며 성장하는 도파민 클리커 게임.<br>' +
-          '<a href="https://github.com/jihwan0223/Break-The-World" target="_blank" rel="noopener">GitHub ↗</a>',
-  },
-  {
-    name: 'SENIOR PARTY',
-    html: 'Unity · C# · Plastic SCM<br>시니어를 위한 인지기능 향상 게임 — 다양한 인지 훈련 미니게임 수록.<br>' +
-          '<a href="https://github.com/jihwan0223/SeniorParty" target="_blank" rel="noopener">GitHub ↗</a>',
-  },
-  {
-    name: 'GAMBLE GAME',
-    html: 'Unity · C#<br>블랙잭에 AI를 연동해 상황별 다양한 대사를 출력하는 카드 게임.<br>' +
-          '<a href="https://github.com/jihwan0223/gamblegame_Unity" target="_blank" rel="noopener">GitHub ↗</a>',
-  },
+  ...PROJECTS.map((p) => ({
+    name: p.title.toUpperCase(),
+    html: `${p.tags.join(' · ')}<br>${p.tagline}<br>` +
+          `<a href="project.html?id=${p.id}">자세히 보기 →</a>`,
+  })),
   {
     name: 'CONTACT',
     html: '메일 보내기: <a href="mailto:jihwan5580@gmail.com">jihwan5580@gmail.com</a><br>' +
@@ -186,7 +198,7 @@ function draw() {
   ctx.clearRect(0, 0, W, H);
 
   // 배경 격자
-  ctx.strokeStyle = '#141414';
+  ctx.strokeStyle = '#232327';
   ctx.lineWidth = 1;
   for (let x = 0; x < W; x += 60) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
@@ -196,11 +208,11 @@ function draw() {
   const groundY = H - GROUND_H;
   ctx.strokeStyle = LINE;
   ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(W, groundY); ctx.stroke();
-  ctx.fillStyle = '#0d0d0d';
+  ctx.fillStyle = '#18181b';
   ctx.fillRect(0, groundY, W, GROUND_H);
 
   // 스팟(프로젝트 포탈)
-  ctx.font = '12px "JetBrains Mono", monospace';
+  ctx.font = '13px "Pretendard Variable", Pretendard, sans-serif';
   ctx.textAlign = 'center';
   for (let i = 0; i < spots.length; i++) {
     const x = spotX(i);
@@ -229,7 +241,7 @@ function draw() {
   const p = player;
   ctx.fillStyle = ACCENT;
   ctx.fillRect(p.x, p.y, p.w, p.h);               // 몸
-  ctx.fillStyle = '#0a0a0a';
+  ctx.fillStyle = '#1c1c1f';
   const eyeX = p.face === 1 ? p.x + p.w - 8 : p.x + 4; // 눈
   ctx.fillRect(eyeX, p.y + 7, 4, 4);
 
