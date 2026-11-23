@@ -333,6 +333,8 @@ a { color: inherit; text-decoration: none; }
   border-radius: 2px;
 }
 .pg-title { font-size: max(30px, 4.4cqw); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.pg-intent { margin-top: 1cqw; font-size: max(14px, 1.35cqw); line-height: 1.6; }
+.pg-intent b { color: var(--accent); margin-right: 0.4em; }
 .pg-meta { display: flex; flex-wrap: wrap; gap: 1cqw 2.4cqw; margin-top: 2.4cqw; }
 .pg-meta dd { font-size: max(14px, 1.35cqw); }
 .pg-link { margin-top: 2.4cqw; font-size: max(13px, 1.25cqw); color: var(--fg-dim); }
@@ -354,6 +356,29 @@ a { color: inherit; text-decoration: none; }
 .pg-result { padding-left: 1.2cqw; border-left: 2px solid var(--accent); }
 .pg-result dt { color: var(--accent) !important; }
 
+/* 아키텍처: 왼쪽 계층 다이어그램, 오른쪽 설계 포인트 */
+.pg-arch { flex: 1; display: grid; grid-template-columns: 2.3fr 1fr; gap: 3cqw; align-items: center; }
+.arch { display: flex; flex-direction: column; gap: 1.8cqw; }
+.arch-row { display: grid; grid-template-columns: 8cqw 1fr; gap: 1.2cqw; align-items: center; }
+.arch-label { font-size: max(11px, 1.1cqw); font-weight: 700; color: var(--accent); }
+.arch-boxes { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1cqw; }
+.arch-row + .arch-row .arch-boxes::before {
+  content: '↓'; position: absolute; top: -1.75cqw; left: 50%; transform: translateX(-50%);
+  font-size: max(11px, 1.1cqw); line-height: 1; color: var(--fg-dim);
+}
+.arch-box {
+  display: flex; flex-direction: column; gap: 0.3cqw; min-width: 0;
+  padding: 1cqw 1.2cqw; background: #fff; border: 1px solid var(--line); border-radius: 8px;
+}
+.arch-box b { font-size: max(12px, 1.35cqw); overflow-wrap: break-word; }
+.arch-box span { font-size: max(11px, 1.1cqw); line-height: 1.45; color: var(--fg-dim); }
+.arch-box.mine { border-color: var(--accent); background: rgba(11, 135, 75, 0.07); }
+.arch-legend { display: flex; align-items: center; gap: 0.5em; justify-content: flex-end; font-size: max(11px, 1cqw); color: var(--fg-dim); }
+.arch-legend i { width: 1.2em; height: 0.8em; border: 1px solid var(--accent); background: rgba(11, 135, 75, 0.07); border-radius: 3px; }
+.arch-points { list-style: none; display: flex; flex-direction: column; gap: 2cqw; }
+.arch-points li { padding-left: 1.2cqw; border-left: 2px solid var(--line); font-size: max(13px, 1.25cqw); line-height: 1.65; color: var(--fg-dim); }
+.arch-points b { display: block; margin-bottom: 0.3cqw; color: var(--fg); }
+
 .next-project {
   width: min(1120px, 100%);
   padding: 24px 0;
@@ -366,7 +391,10 @@ a { color: inherit; text-decoration: none; }
 /* 좁은 화면: 비율 고정 해제하고 세로로 쌓음 */
 @media (max-width: 700px) {
   .page { aspect-ratio: auto; padding: 20px; }
-  .pg-cols, .pg-cover, .pg-flow, .pg-trouble { grid-template-columns: 1fr; gap: 20px; }
+  .pg-cols, .pg-cover, .pg-flow, .pg-trouble, .pg-arch, .arch-row { grid-template-columns: 1fr; gap: 20px; }
+  .arch-row { gap: 8px; }
+  .arch-boxes { grid-auto-flow: row; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .arch-row + .arch-row .arch-boxes::before { display: none; }
 }
 
 /* 인쇄 = PDF 저장: A4 가로 한 장에 한 페이지 */

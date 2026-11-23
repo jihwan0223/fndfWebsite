@@ -9,35 +9,53 @@ const PROJECTS = [
     award: '2026 시니어 인지기능 향상 해커톤 우수상',
     tags: ['Unity', 'C#', 'UI Toolkit', '모바일', 'Plastic SCM'],
     github: 'https://github.com/jihwan0223/SeniorParty',
-    meta: { 기간: '', 인원: '', 역할: '', 플랫폼: '모바일' },
+    meta: {
+      기간: '2026.09 ~ 2026.10 (약 1개월)',
+      인원: '3명',
+      역할: '미니게임 4종 개발 (물건 분류 · 큐브 깎기 · 순서 기억 · 모양 맞추기), UI 통일, 사운드',
+      플랫폼: '모바일 (Android)',
+    },
     flow: [
       { src: '01.png', caption: '게임 선택', desc: '10종 인지 훈련 중 원하는 게임 선택' },
       { src: '02.png', caption: '큐브 깎기', desc: '보여준 모양을 기억해 같은 모양으로 깎기' },
       { src: '03.png', caption: '결과 화면', desc: '라운드별 O/X와 점수, 다음 난이도 반영' },
     ],
+    arch: {
+      rows: [
+        ['메뉴', [['MainMenuController', 'UI Toolkit 메뉴 · 게임 선택 · 설정 · 크레딧'], ['SafeAreaApplier', '노치 · 세이프 에어리어 대응']]],
+        ['미니게임', [['DifficultyGameController', '추상 클래스 · 공통 난이도 조절'], ['물건 분류 · 큐브 깎기', 'ItemSort · CubeCarve · Cube3DView', true], ['순서 기억 · 모양 맞추기', 'Matrix · RotateGrid', true], ['그 외 6종', '팀원 담당']]],
+        ['공통 UI', [['커스텀 VisualElement', 'CircularProgress · ShapeGridView'], ['TrialResultsView', '라운드별 결과 화면'], ['ResultMessage', '하트 대신 문장 피드백', true]]],
+        ['데이터 · 사운드', [['SaveManager', 'JSON 저장 · 불러오기'], ['SoundManager', '배경음 · 정답 · 오답 · 클릭 효과음']]],
+      ],
+      points: [
+        ['추상 클래스로 10종 통일', '모든 미니게임이 DifficultyGameController를 상속해 난이도 저장 · 조절 방식을 공유. 새 게임은 규칙만 구현하면 됨.'],
+        ['게임마다 씬 분리', '메뉴에서 씬 이름으로 진입하고, 나가기를 누르면 결과를 보여준 뒤 메뉴로 복귀 (트러블슈팅 2).'],
+        ['UI Toolkit 커스텀 요소', '진행 원형 · 도형 격자를 VisualElement로 만들어 여러 게임에서 재사용.'],
+      ],
+    },
     troubles: [
       {
-        title: '저장 중 앱이 꺼지면 세이브가 깨짐',
-        problem: '모바일은 저장 도중 앱이 종료되는 일이 잦아, 반쯤 쓰인 save.json 때문에 진행도가 날아갈 수 있었다.',
-        cause: '기존 파일을 직접 덮어쓰는 방식이라, 쓰기 도중 종료되면 파일이 손상된 상태로 남음.',
-        solution: '임시 파일에 먼저 쓰고 File.Replace로 원자적 교체, 기존 파일은 .bak으로 보관. 로드 실패 시 백업에서 복구. 복구 경로에서 Save()를 다시 부르면 깨진 파일이 백업을 덮어쓰는 2차 버그까지 찾아 분리.',
-        result: '저장 중 강제 종료에도 마지막 정상 상태로 복구.',
+        title: '큐브 테두리 선 굵기가 들쭉날쭉한 문제',
+        problem: '큐브 깎기 게임에서 조각 경계선이 위치마다 굵기가 다르고, 정면 모서리에서는 선이 끊겨 보였다. 시니어가 조각을 구분하기 어려웠다.',
+        cause: '조각 사이에 틈을 두고, 조각보다 살짝 큰 검정 껍데기를 뒤집어 그리는 외곽선 방식이라 시점에 따라 틈 두께가 달라지고, 시야와 겹치는 모서리에서 정밀도 문제가 생김.',
+        solution: '조각을 틈 없이 붙이고, 각 면 가장자리에 직접 테두리를 그리는 전용 셰이더로 교체. 외곽선용 껍데기 오브젝트와 전용 조명을 제거.',
+        result: '어느 위치에서도 같은 굵기의 선 — 조각당 렌더링 오브젝트가 2개에서 1개로 감소.',
         img: 'trouble-1.png',
       },
       {
-        title: '시니어에게 갑자기 어려워지는 난이도',
-        problem: '정답률에 따라 난이도를 단계별로 올리면, 한 판 만에 체감 난이도가 확 뛰어 이탈 위험이 컸다.',
-        cause: '정수 단계 난이도는 한 칸만 올라가도 조각 수·노출 시간이 크게 바뀜.',
-        solution: '1.00~10.00 연속값 난이도를 공통 부모 클래스로 만들고, 올릴 땐 0.1 / 내릴 땐 0.17로 비대칭 조정. 난이도 구간별로 조각 수·노출 시간·접근 방식을 매 라운드 새로 계산.',
-        result: '만점을 계속 받아도 약 45세션에 걸쳐 천천히 상승 — 4개 게임이 같은 규칙 공유.',
+        title: '나가기를 눌러도 결과가 안 나오고 게임이 다시 시작됨',
+        problem: '게임 도중 나가기를 누르면 결과 화면 없이 빠져나가거나, 잠시 뒤 다음 라운드가 저절로 시작됐다.',
+        cause: '나가기가 바로 메뉴로 이동만 했고, 이미 예약돼 있던 라운드 전환 콜백이 그대로 실행됨.',
+        solution: '나가기 시 타이머와 입력을 멈추고 지금까지 기록으로 결과 화면을 표시. 결과가 뜬 뒤에는 예약 콜백이 라운드를 다시 시작하지 못하게 종료 상태 플래그로 차단. 같은 문제가 있던 3개 게임에 공통 적용.',
+        result: '언제 나가도 그때까지의 결과를 확인 가능.',
         img: 'trouble-2.png',
       },
       {
-        title: '노치에 가려지는 UI',
-        problem: '노치·펀치홀 기기에서 뒤로 가기 버튼과 결과창이 가려짐.',
-        cause: 'UI Toolkit은 y축이 위에서 0, Screen.safeArea는 아래에서 0이라 그대로 쓰면 여백 방향이 뒤집힘. 씬 전환 직후 UI가 몇 프레임 늦게 붙는 문제도 겹침.',
-        solution: '스크린 좌표를 패널 좌표로 변환해 배율까지 반영한 여백을 루트에 적용. UI가 준비될 때까지 대기 후 적용하고, 해상도·세이프 에어리어가 바뀔 때만 재계산.',
-        result: '기기별 노치와 무관하게 UI가 안전 영역 안에 배치.',
+        title: '손떨림으로 조각이 여러 개 지워지는 문제',
+        problem: '시니어 사용자는 화면을 길게 누르거나 손이 떨려, 의도하지 않은 조각까지 지워지는 일이 잦았다.',
+        cause: '누르는 순간 바로 지워지고, 동시·연속 입력을 그대로 받음.',
+        solution: '누른 뒤 손을 뗄 때 지워지도록 변경. 동시 입력과 0.3초 안의 연속 입력은 무시. 틀려도 맞게 지운 비율만큼 부분 점수를 주고, 연속 2라운드 성적에 따라 조각 수를 자동 조절.',
+        result: '오입력 감소 — 실수해도 좌절하지 않고 이어서 플레이 가능.',
         img: 'trouble-3.png',
       },
     ],
@@ -46,14 +64,27 @@ const PROJECTS = [
     id: 'breakthewaxworld',
     title: 'Break The Wax World',
     tagline: '왁스로 뒤덮인 오브젝트를 부수며 성장하는 도파민 클리커 게임.',
-    tags: ['Unity', 'C#', 'Python', 'Feel'],
-    github: 'https://github.com/jihwan0223/Break-The-World',
-    meta: { 기간: '', 인원: '', 역할: '', 플랫폼: 'PC' },
+    tags: ['Unity', 'C#', 'Feel'],
+    github: 'https://github.com/jihwan0223/BreakTheWaxWorrld',
+    meta: { 기간: '2026.08 ~ 2026.11 (커밋 184개)', 인원: '1명 (개인 프로젝트)', 역할: '기획 · 프로그래밍 전체', 플랫폼: 'PC' },
     flow: [
       { src: '01.png', caption: '왁스 부수기', desc: '클릭으로 왁스를 깨고 파편을 모아 재화 획득' },
       { src: '02.png', caption: '업그레이드 트리', desc: '재화로 공격력·자동 수집·구역 해금 강화' },
       { src: '03.png', caption: '보스 도전', desc: '구역 끝 보스를 부수고 다음 구역으로' },
     ],
+    arch: {
+      rows: [
+        ['입력', [['Click', '클릭 · 자동 클릭, 데미지 · 보상 계산'], ['Health', '체력 · 부서짐 단계 · 피격 연출'], ['SpriteColliderSync', '볼록 껍질 콜라이더 재계산']]],
+        ['보상', [['DebrisPool', 'Stack 풀 · 50조각 초과분 병합'], ['AutoSweeper', '바닥 파편 자동 수집'], ['CurrencyManager', '조각 · 결정 · 별조각 재화']]],
+        ['진행', [['UpgradeManager', '업그레이드 트리 · 환생 배율'], ['ObjectManager · WeaponManager', '오브젝트 도감 · 무기 장착'], ['ZoneManager', '구역 해금 · 보스']]],
+        ['저장 · UI', [['SaveManager', '이벤트 구독 → 디바운스 JSON 저장'], ['UI', '업그레이드 트리 · 사이드 패널 · 튜토리얼']]],
+      ],
+      points: [
+        ['싱글턴 매니저 + C# 이벤트', '매니저는 값이 바뀌면 이벤트(Action)만 발행. UI와 저장은 구독만 하므로 매니저가 UI를 몰라도 됨.'],
+        ['저장은 디바운스로 한 번만', 'SaveManager가 모든 매니저 이벤트를 구독하고, 변경이 몰려도 1초 뒤 한 번만 기록. 실시간 타이머라 일시정지 중에도 저장.'],
+        ['보상 계산은 한 곳에서', '기본 보상 × 업그레이드 배율 + 무기 · 오브젝트 보너스를 Click에서 계산하고, 파편으로 떨굴지 즉시 지급할지만 나눔.'],
+      ],
+    },
     troubles: [
       {
         title: '파편이 수천 개 쏟아지며 생기는 렉',
@@ -64,11 +95,11 @@ const PROJECTS = [
         img: 'trouble-1.png',
       },
       {
-        title: '부서질 때마다 오브젝트가 튀는 현상',
-        problem: '체력 단계별 이미지(4단계)로 바뀔 때마다 오브젝트 위치와 크기가 들쭉날쭉하게 보임.',
-        cause: '단계가 진행될수록 파편이 사방으로 퍼져 이미지 크기가 커지는데, 이를 기준으로 맞추면 본체가 작아짐.',
-        solution: 'Python(Pillow·NumPy) 정렬 툴 제작 — 파편을 제외한 본체 바닥선과 받침 중심을 찾아 캔버스를 맞추고, 크기 차이는 픽셀 리사이즈 대신 PPU로 보정. 결과를 .meta에 자동 반영하는 스크립트까지 연결.',
-        result: '신규 오브젝트 추가 시 수작업 없이 스크립트 실행만으로 정렬.',
+        title: '부서진 오브젝트의 틈으로 클릭이 빠지는 문제',
+        problem: '체력이 줄어 오브젝트가 여러 조각으로 갈라지면, 조각 사이 틈을 클릭했을 때 타격이 들어가지 않았다.',
+        cause: '스프라이트의 물리 윤곽을 그대로 콜라이더로 쓰면 덩어리 사이가 빈 공간으로 남음.',
+        solution: '스프라이트가 바뀔 때만 콜라이더를 다시 계산. 윤곽이 여러 개면 모든 점을 모아 볼록 껍질(Convex Hull) 하나로 합치고 가장자리 여백을 추가. 계산용 리스트는 재사용해 매번 메모리를 새로 잡지 않음.',
+        result: '부서진 단계와 상관없이 오브젝트 어디를 눌러도 타격 판정.',
         img: 'trouble-2.png',
       },
       {
@@ -86,13 +117,26 @@ const PROJECTS = [
     title: 'Gamble Game',
     tagline: '블랙잭에 AI를 연동해 상황별 다양한 대사를 출력하는 카드 게임.',
     tags: ['Unity', 'C#', 'LLM API', '한/영'],
-    github: 'https://github.com/jihwan0223/gamblegame_Unity',
-    meta: { 기간: '', 인원: '', 역할: '', 플랫폼: 'PC' },
+    github: 'https://github.com/jihwan0223/gamblegame',
+    meta: { 기간: '2026.03 ~ 2026.06 (커밋 64개)', 인원: '1명 (개인 프로젝트)', 역할: '기획 · 프로그래밍 전체', 플랫폼: 'PC' },
     flow: [
       { src: '01.png', caption: '베팅', desc: '판돈을 걸고 라운드 시작' },
       { src: '02.png', caption: '블랙잭 진행', desc: '히트·스탠드로 21에 가깝게' },
       { src: '03.png', caption: 'AI 딜러 대사', desc: '결과에 맞춰 AI가 매번 다른 대사 생성' },
     ],
+    arch: {
+      rows: [
+        ['씬', [['MainScene', '로비 · 설정 · 언어 전환'], ['GameScene', '블랙잭 라운드'], ['UpgradeScene', '스킬 트리'], ['WorkScene', '알바로 돈 벌기']]],
+        ['게임 흐름', [['GameController', '히트 · 스테이 입력'], ['GameManager', '라운드 시작 · 종료 · 다음 판'], ['DeckManager', '덱 생성 · 셔플']]],
+        ['판정 · 대사', [['PlayerHand ×2', '플레이어 · 딜러 패와 점수'], ['DealerAI', '딜러 행동 · 승패 확정'], ['GroqAI', '결과 코드 → 대사 요청']]],
+        ['경제 · 저장', [['BettingManager', '베팅 · 배당 지급'], ['UpgradeManager', '스킬 트리 효과'], ['DataManager', '변경 즉시 JSON 저장']]],
+      ],
+      points: [
+        ['판정은 코드, 대사는 AI', 'DealerAI가 승패를 확정하고 GroqAI에는 점수와 결과 코드만 전달. LLM은 대사만 만들어 결과와 대사가 어긋나지 않음.'],
+        ['비동기 요청과 실패 대비', '코루틴 + UnityWebRequest로 게임을 멈추지 않고 요청. 실패하면 기본 대사로 대체.'],
+        ['돈이 바뀌면 바로 저장', '베팅 확정 · 승리 · 패배 · 무승부 모든 지점에서 DataManager로 즉시 저장.'],
+      ],
+    },
     troubles: [
       {
         title: 'AI가 승패를 틀리게 말함',
@@ -112,6 +156,76 @@ const PROJECTS = [
       },
     ],
   },
+  {
+    id: 'towerrior',
+    title: 'Towerrior',
+    tagline: '웨이브마다 몰려오는 적을 타워 배치와 업그레이드로 막아내는 모바일 타워 디펜스 게임.',
+    tags: ['Unity', 'C#', '모바일', '오브젝트 풀링', 'Plastic SCM'],
+    meta: {
+      기간: '2026.06.29 ~ 2026.07.09 (11일)',
+      인원: '4명',
+      역할: '적 · 웨이브 · 타워 전투 시스템, 타워 업그레이드 · 버프, 보스, 맵 3 · 4 제작, 카메라 조작 (팀 내 최다 커밋)',
+      플랫폼: '모바일 (Android)',
+    },
+    flow: [
+      { src: '01.png', caption: '타워 배치', desc: '구매 패널에서 타워를 골라 맵에 설치' },
+      { src: '02.png', caption: '웨이브 방어', desc: '웨이브마다 늘어나는 적을 업그레이드로 막기' },
+      { src: '03.png', caption: '보스 등장', desc: '등장 연출과 함께 나타나는 보스 처치' },
+    ],
+    arch: {
+      rows: [
+        ['코어', [['GameManager', '골드 · 체력 · 웨이브 상태'], ['StageManager', '스테이지 진행'], ['GridManager · Grid', '타워 배치 칸', true], ['CameraRigController', '드래그 · 줌 카메라', true]]],
+        ['적', [['EnemySpawner', '웨이브 스폰 · 클리어 보상', true], ['EnemyPool', '타입별 오브젝트 풀'], ['Enemy', '경로 이동 · 피격 · 처치', true], ['Boss', 'Enemy 상속 · 보스 전용 처리', true]]],
+        ['타워', [['TowerSpawner', '배치 · 판매 · 환불'], ['TowerManager · TowerSelectUI', '타워 선택', true], ['Tower', '추상 클래스 · Default · Buff · Gold · Slow', true], ['TowerUpgrade', '추상 클래스 · 타워별 업그레이드', true]]],
+        ['UI · 기타', [['HUD', '골드 · 웨이브 · 보스 경고'], ['Save · Settings', '진행 저장 · 설정'], ['Loading', '씬 로딩 · 팁']]],
+      ],
+      points: [
+        ['상속으로 타워 · 적 확장', 'Tower와 TowerUpgrade를 추상 클래스로 두고 4종 타워가 각각 상속. 보스도 Enemy를 상속해 이동 · 피격 로직을 재사용.'],
+        ['적은 오브젝트 풀로 재사용', '생성 · 파괴 대신 타입별 풀에서 꺼내 쓰고 처치되면 반납. 그래서 타깃 검사에 활성 여부 확인이 필요했음 (트러블슈팅 1).'],
+        ['상태는 GameManager 한 곳에서', '골드 · 체력 · 웨이브는 GameManager만 바꾸고, 적 · 타워는 AddGold · TakeDamage만 호출.'],
+      ],
+    },
+    troubles: [
+      {
+        title: '빌드에서만 총알이 엉뚱한 적을 쫓아가는 문제',
+        problem: '에디터에서는 정상인데, 빌드에서는 총알이 이미 처치된 적을 계속 쫓거나 화면 다른 곳의 적에게 날아갔다.',
+        cause: '적을 오브젝트 풀로 재사용해서, 처치된 적은 파괴되지 않고 비활성화만 됨. null 검사로는 비활성 적을 걸러내지 못해, 재사용된 적을 계속 타깃으로 잡음.',
+        solution: '타깃이 null이거나 비활성 상태면 즉시 타깃을 해제하도록 조건 추가.',
+        result: '풀링된 적이 재사용돼도 총알이 정확한 대상만 추적.',
+        img: 'trouble-1.png',
+      },
+      {
+        title: '버프 타워를 없애도 버프가 남는 문제',
+        problem: '버프 타워를 팔거나 파괴해도 주변 타워의 공격력 증가와 깜빡임 효과가 계속 유지됐다.',
+        cause: '버프를 줄 때만 처리하고, 누구에게 줬는지 기록하지 않아 해제할 방법이 없었음.',
+        solution: '버프를 준 타워 목록을 기록하고, 버프 타워가 비활성화될 때 목록의 타워에서 버프와 효과를 한 번에 해제. 조준이 필요 없는 타워는 회전 로직에서 분리.',
+        result: '타워 구성을 바꿔도 능력치가 정확하게 유지 — 밸런스 붕괴 방지.',
+        img: 'trouble-2.png',
+      },
+      {
+        title: '적이 길을 벗어나 대각선으로 이동하는 문제',
+        problem: '맵을 추가하자 적이 생성되자마자 길을 무시하고 첫 지점까지 대각선으로 가로질렀다.',
+        cause: '스폰 위치를 맵마다 따로 지정해서 경로 시작점과 어긋남. 경로가 없는 맵에서는 오류도 발생.',
+        solution: '일반 적과 보스 모두 경로의 첫 지점에서 생성되도록 통일하고, 경로가 비어 있을 때를 대비한 예외 처리 추가.',
+        result: '맵을 새로 만들어도 스폰 위치를 따로 맞출 필요 없이 경로대로 이동.',
+        img: 'trouble-3.png',
+      },
+    ],
+  },
+  {
+    id: 'writinggrandfather',
+    title: 'Writing Grandfather',
+    tagline: '노인과 아이들을 위한 모바일 글쓰기 연습 게임.',
+    intent: '종이에 글을 쓰는 것보다 재미있게 글쓰기를 연습할 수 있도록.',
+    tags: ['Unity', 'C#', '모바일'],
+    meta: { 기간: '', 인원: '', 역할: '', 플랫폼: '모바일' },
+    flow: [
+      { src: '01.png', caption: '장면 1', desc: '설명을 적어 주세요' },
+      { src: '02.png', caption: '장면 2', desc: '설명을 적어 주세요' },
+      { src: '03.png', caption: '장면 3', desc: '설명을 적어 주세요' },
+    ],
+    troubles: [],
+  },
 ];
 
 // 프로필 — 메인 페이지 Skills/History 섹션과 PDF 첫 장이 여기서 읽음
@@ -123,13 +237,12 @@ const PROFILE = {
   github: 'https://github.com/jihwan0223',
   skills: [
     ['엔진', ['Unity 2D / 3D', 'UI Toolkit', 'uGUI', 'Input System', 'Feel (MMFeedbacks)']],
-    ['언어', ['C#', 'Python']],
-    ['게임 시스템', ['업그레이드 트리', '환생 · 프레스티지', '재화 경제', '적응형 난이도', '스킬 트리', '튜토리얼', '다국어 (한/영)']],
-    ['데이터', ['JSON 세이브 / 로드', '원자적 저장 · 백업 복구', '세이브 마이그레이션']],
+    ['언어', ['C#']],
+    ['데이터', ['JSON 세이브 / 로드', '이벤트 기반 자동 저장', '세이브 폴더 마이그레이션']],
     ['최적화', ['오브젝트 풀링', '파편 병합', 'GC 할당 최소화']],
     ['AI', ['LLM API 연동', '프롬프트 설계', 'UnityWebRequest']],
     ['플랫폼', ['PC', '모바일', '세이프 에어리어 대응']],
-    ['툴', ['Git', 'GitHub', 'Plastic SCM', 'VS Code', 'Pillow · NumPy 자동화']],
+    ['툴', ['Git', 'GitHub', 'Plastic SCM', 'VS Code']],
   ],
   awards: [
     { date: '2026', name: '시니어 인지기능 향상 해커톤 — 우수상', desc: '(주)에이아이씨유 주최 · 출품작 Senior Party' },
@@ -191,9 +304,10 @@ function buildDeck() {
             ${p.award ? `<p class="pg-badge">★ ${p.award}</p>` : ''}
             <h1 class="pg-title">${p.title}</h1>
             <p class="pg-lead">${p.tagline}</p>
+            ${p.intent ? `<p class="pg-intent"><b>기획 의도</b> ${p.intent}</p>` : ''}
             ${tagList(p.tags)}
             ${meta ? `<dl class="pg-meta">${meta}</dl>` : ''}
-            <p class="pg-link"><a href="${p.github}" target="_blank" rel="noopener">${p.github.replace('https://', '')}</a></p>
+            ${p.github ? `<p class="pg-link"><a href="${p.github}" target="_blank" rel="noopener">${p.github.replace('https://', '')}</a></p>` : ''}
           </div>
         </div>`,
     });
@@ -210,6 +324,25 @@ function buildDeck() {
             <p class="dim">${f.desc}</p>
           </li>`).join('')}
         </ol>`,
+    });
+
+    if (p.arch) deck.push({
+      project: p,
+      label: `${p.title} · 아키텍처`,
+      body: `
+        <h2 class="pg-h">아키텍처</h2>
+        <div class="pg-arch">
+          <div class="arch">${p.arch.rows.map(([label, boxes]) => `
+            <div class="arch-row">
+              <p class="arch-label">${label}</p>
+              <div class="arch-boxes">${boxes.map(([name, desc, mine]) => `
+                <div class="arch-box${mine ? ' mine' : ''}"><b>${name.replace(/([a-z])([A-Z])/g, '$1<wbr>$2')}</b><span>${desc}</span></div>`).join('')}
+              </div>
+            </div>`).join('')}
+            ${p.arch.rows.some(([, b]) => b.some((x) => x[2])) ? '<p class="arch-legend"><i></i>직접 구현</p>' : ''}
+          </div>
+          <ol class="arch-points">${p.arch.points.map(([t, d]) => `<li><b>${t}</b>${d}</li>`).join('')}</ol>
+        </div>`,
     });
 
     p.troubles.forEach((t, i) => deck.push({
