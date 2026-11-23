@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JIHWAN — Game Developer</title>
+<title>JIHWAN — 게임 개발자 포트폴리오</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="description" content="플레이어가 기억할 순간을 만드는 게임 개발자 JIHWAN의 포트폴리오.">
-<meta property="og:title" content="JIHWAN — Game Developer">
-<meta property="og:description" content="플레이어가 기억할 순간을 만드는 게임 개발자. 포트폴리오를 직접 플레이해 보세요.">
+<meta property="og:title" content="JIHWAN — 게임 개발자 포트폴리오">
+<meta property="og:description" content="Unity · C# 게임 개발자 JIHWAN의 프로젝트와 트러블슈팅 기록.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -15,82 +15,65 @@
 </head>
 <body>
 
-<!-- ===== 상단 바 ===== -->
 <header class="topbar">
-  <a class="logo mono" href="#top">JIHWAN<span class="accent">_</span></a>
+  <a class="logo" href="#top">JIHWAN</a>
   <nav class="nav">
-    <a href="#projects">Projects</a>
-    <a href="#skills">Skills</a>
-    <a href="#history">History</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-    <a href="pdf.html" class="accent">PDF</a>
+    <a href="#about">소개</a>
+    <a href="#projects">프로젝트</a>
+    <a href="#skills">기술 스택</a>
+    <a href="#history">수상 · 경력</a>
+    <a href="#contact">연락처</a>
   </nav>
-  <button id="playToggle" class="play-toggle mono" title="게임 모드 (PC 전용)">
-    <span class="dot"></span>PLAY MODE
-  </button>
+  <a class="btn btn-sm" href="pdf.html">PDF 포트폴리오</a>
 </header>
 
-<!-- ===== B: 미니멀 다크 갤러리 ===== -->
-<main id="siteMode">
-
+<main>
   <section class="hero" id="top">
-    <p class="mono hero-pre accent">// game developer</p>
-    <h1 class="hero-title">JIHWAN</h1>
-    <p class="hero-sub">플레이어가 기억할 순간을 만드는 게임 개발자.</p>
-    <p class="mono hero-hint">↑ 상단 <span class="accent">PLAY MODE</span>로 포트폴리오를 직접 플레이할 수 있습니다 (PC)</p>
-  </section>
-
-  <section class="section" id="projects">
-    <h2 class="section-title mono"><span class="accent">01</span> PROJECTS</h2>
-    <!-- 내용은 projects.js 에서 채움 -->
-    <div class="project-list" id="projectList"></div>
-  </section>
-
-  <section class="section" id="skills">
-    <h2 class="section-title mono"><span class="accent">02</span> SKILLS</h2>
-    <dl class="skills" id="skillList"></dl>
-  </section>
-
-  <section class="section" id="history">
-    <h2 class="section-title mono"><span class="accent">03</span> AWARDS &amp; CAREER</h2>
-    <ol class="history" id="awardList"></ol>
+    <p class="hero-role">게임 개발자</p>
+    <h1 class="hero-title">안녕하세요,<br>게임 개발자 JIHWAN입니다.</h1>
+    <p class="hero-sub">플레이어가 기억할 순간을 만드는 게임을 만듭니다.</p>
+    <div class="hero-actions">
+      <a class="btn" href="pdf.html">포트폴리오 PDF</a>
+      <a class="btn btn-line" href="https://github.com/jihwan0223" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-line" href="mailto:jihwan5580@gmail.com">이메일</a>
+    </div>
   </section>
 
   <section class="section" id="about">
-    <h2 class="section-title mono"><span class="accent">04</span> ABOUT</h2>
+    <h2 class="section-title">소개</h2>
     <p class="about-text">
       자기소개가 들어갈 자리입니다. 어떤 게임을 만들고 싶은지,
       무엇을 중요하게 생각하는 개발자인지 한 문단으로 적어 주세요.
     </p>
   </section>
 
+  <section class="section" id="projects">
+    <h2 class="section-title">프로젝트</h2>
+    <!-- 내용은 projects.js 에서 채움 -->
+    <div class="project-list" id="projectList"></div>
+  </section>
+
+  <section class="section" id="skills">
+    <h2 class="section-title">기술 스택</h2>
+    <dl class="skills" id="skillList"></dl>
+  </section>
+
+  <section class="section" id="history">
+    <h2 class="section-title">수상 · 경력</h2>
+    <ol class="history" id="awardList"></ol>
+  </section>
+
   <section class="section" id="contact">
-    <h2 class="section-title mono"><span class="accent">05</span> CONTACT</h2>
-    <ul class="contact-list mono">
-      <li><span class="label">email</span><a href="mailto:jihwan5580@gmail.com">jihwan5580@gmail.com</a></li>
-      <li><span class="label">github</span><a href="https://github.com/jihwan0223" target="_blank" rel="noopener">github.com/jihwan0223</a></li>
+    <h2 class="section-title">연락처</h2>
+    <ul class="contact-list">
+      <li><span class="label">이메일</span><a href="mailto:jihwan5580@gmail.com">jihwan5580@gmail.com</a></li>
+      <li><span class="label">GitHub</span><a href="https://github.com/jihwan0223" target="_blank" rel="noopener">github.com/jihwan0223</a></li>
       <li><span class="label">itch.io</span><a href="#" target="_blank" rel="noopener">아이디.itch.io</a></li>
     </ul>
   </section>
 
-  <footer class="footer mono">© 2026 JIHWAN — hand-coded, no template</footer>
+  <footer class="footer">© 2026 JIHWAN</footer>
 </main>
-
-<!-- ===== C: 게임 모드 (PC 전용) ===== -->
-<div id="gameMode" class="game-mode" hidden>
-  <canvas id="gameCanvas"></canvas>
-  <div class="game-hud mono">
-    <span>WASD / ←→ 이동</span>
-    <span><span class="accent">E</span> 조사</span>
-    <span><span class="accent">ESC</span> 나가기</span>
-  </div>
-  <div id="gamePanel" class="game-panel mono" hidden>
-    <h3 id="panelTitle"></h3>
-    <p id="panelDesc"></p>
-    <p class="panel-close">[ E 또는 ESC 로 닫기 ]</p>
-  </div>
-</div>
 
 <script src="projects.js"></script>
 <script src="script.js"></script>

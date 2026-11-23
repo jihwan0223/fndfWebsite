@@ -1,4 +1,4 @@
-// 포트폴리오 데이터 — 메인 페이지, 게임 모드, 프로젝트 상세, PDF가 전부 여기서 읽음.
+// 포트폴리오 데이터 — 메인 페이지, 프로젝트 상세, PDF가 전부 여기서 읽음.
 // 배열 순서 = 화면 순서 (가장 자신 있는 프로젝트를 맨 앞에).
 // 이미지는 images/<id>/ 폴더에 넣으면 자동으로 뜸. 없으면 파일명이 적힌 빈칸으로 표시.
 const PROJECTS = [
@@ -7,9 +7,9 @@ const PROJECTS = [
     title: 'Senior Party',
     tagline: '시니어를 위한 인지기능 향상 게임 — 10종의 인지 훈련 미니게임 수록.',
     award: '2026 시니어 인지기능 향상 해커톤 우수상',
-    tags: ['Unity', 'C#', 'UI Toolkit', 'Mobile', 'Plastic SCM'],
+    tags: ['Unity', 'C#', 'UI Toolkit', '모바일', 'Plastic SCM'],
     github: 'https://github.com/jihwan0223/SeniorParty',
-    meta: { 기간: '', 인원: '', 역할: '', 플랫폼: 'Mobile' },
+    meta: { 기간: '', 인원: '', 역할: '', 플랫폼: '모바일' },
     flow: [
       { src: '01.png', caption: '게임 선택', desc: '10종 인지 훈련 중 원하는 게임 선택' },
       { src: '02.png', caption: '큐브 깎기', desc: '보여준 모양을 기억해 같은 모양으로 깎기' },
@@ -117,19 +117,19 @@ const PROJECTS = [
 // 프로필 — 메인 페이지 Skills/History 섹션과 PDF 첫 장이 여기서 읽음
 const PROFILE = {
   name: 'JIHWAN',
-  role: 'Game Developer',
+  role: '게임 개발자',
   tagline: '플레이어가 기억할 순간을 만드는 게임 개발자.',
   email: 'jihwan5580@gmail.com',
   github: 'https://github.com/jihwan0223',
   skills: [
-    ['Engine', ['Unity 2D / 3D', 'UI Toolkit', 'uGUI', 'Input System', 'Feel (MMFeedbacks)']],
-    ['Language', ['C#', 'Python']],
-    ['Game Systems', ['업그레이드 트리', '환생 · 프레스티지', '재화 경제', '적응형 난이도', '스킬 트리', '튜토리얼', '다국어 (한/영)']],
-    ['Data', ['JSON 세이브 / 로드', '원자적 저장 · 백업 복구', '세이브 마이그레이션']],
-    ['Optimization', ['오브젝트 풀링', '파편 병합', 'GC 할당 최소화']],
+    ['엔진', ['Unity 2D / 3D', 'UI Toolkit', 'uGUI', 'Input System', 'Feel (MMFeedbacks)']],
+    ['언어', ['C#', 'Python']],
+    ['게임 시스템', ['업그레이드 트리', '환생 · 프레스티지', '재화 경제', '적응형 난이도', '스킬 트리', '튜토리얼', '다국어 (한/영)']],
+    ['데이터', ['JSON 세이브 / 로드', '원자적 저장 · 백업 복구', '세이브 마이그레이션']],
+    ['최적화', ['오브젝트 풀링', '파편 병합', 'GC 할당 최소화']],
     ['AI', ['LLM API 연동', '프롬프트 설계', 'UnityWebRequest']],
-    ['Platform', ['PC', 'Mobile', 'Safe Area 대응']],
-    ['Tools', ['Git', 'GitHub', 'Plastic SCM', 'VS Code', 'Pillow · NumPy 자동화']],
+    ['플랫폼', ['PC', '모바일', '세이프 에어리어 대응']],
+    ['툴', ['Git', 'GitHub', 'Plastic SCM', 'VS Code', 'Pillow · NumPy 자동화']],
   ],
   awards: [
     { date: '2026', name: '시니어 인지기능 향상 해커톤 — 우수상', desc: '(주)에이아이씨유 주최 · 출품작 Senior Party' },
@@ -152,7 +152,7 @@ const chipList = (items) => `<div class="chips">${items.map((t) => `<span>${t}</
 function buildDeck() {
   const deck = [{
     project: null,
-    label: 'PROFILE',
+    label: '프로필',
     body: `
       <div class="pg-cols">
         <div class="pg-col">
@@ -160,18 +160,18 @@ function buildDeck() {
           <h1 class="pg-name">${PROFILE.name}</h1>
           <p class="pg-lead">${PROFILE.tagline}</p>
           <dl class="pg-contact">
-            <div><dt>Email</dt><dd>${PROFILE.email}</dd></div>
+            <div><dt>이메일</dt><dd>${PROFILE.email}</dd></div>
             <div><dt>GitHub</dt><dd>${PROFILE.github.replace('https://', '')}</dd></div>
           </dl>
         </div>
         <div class="pg-col">
-          <h2 class="pg-h">Skills</h2>
+          <h2 class="pg-h">기술 스택</h2>
           <dl class="pg-skills">${PROFILE.skills.map(([g, items]) => `<div><dt>${g}</dt><dd>${chipList(items)}</dd></div>`).join('')}</dl>
         </div>
         <div class="pg-col">
-          <h2 class="pg-h">Awards</h2>
+          <h2 class="pg-h">수상</h2>
           ${PROFILE.awards.map((a) => `<div class="pg-award"><p class="accent">${a.date}</p><p class="pg-award-name">${a.name}</p><p class="dim">${a.desc}</p></div>`).join('')}
-          <h2 class="pg-h">Projects</h2>
+          <h2 class="pg-h">프로젝트</h2>
           <ol class="pg-index">${PROJECTS.map((p) => `<li>${p.title}</li>`).join('')}</ol>
         </div>
       </div>`,
@@ -200,7 +200,7 @@ function buildDeck() {
 
     deck.push({
       project: p,
-      label: `${p.title} · Play Flow`,
+      label: `${p.title} · 플레이 흐름`,
       body: `
         <h2 class="pg-h">플레이 흐름</h2>
         <ol class="pg-flow">${p.flow.map((f, i) => `
@@ -214,7 +214,7 @@ function buildDeck() {
 
     p.troubles.forEach((t, i) => deck.push({
       project: p,
-      label: `${p.title} · Troubleshooting ${i + 1}`,
+      label: `${p.title} · 트러블슈팅 ${i + 1}`,
       body: `
         <h2 class="pg-trouble-title"><span class="accent">#${i + 1}</span> ${t.title}</h2>
         <div class="pg-trouble">

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JIHWAN — Project</title>
+<title>JIHWAN — 프로젝트</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="style.css">
@@ -11,7 +11,7 @@
 <body>
 
 <header class="topbar">
-  <a class="logo" href="index.html">JIHWAN<span class="accent">_</span></a>
+  <a class="logo" href="index.html">JIHWAN</a>
   <nav class="nav">
     <a href="index.html#projects">← 프로젝트 목록</a>
     <a href="pdf.html" class="accent">전체 PDF</a>
@@ -34,7 +34,7 @@
     document.title = `${p.title} — JIHWAN`;
     deck.innerHTML = renderDeck((pg) => pg.project === p) + `
       <a class="next-project" href="project.html?id=${next.id}">
-        <span>NEXT PROJECT</span>
+        <span>다음 프로젝트</span>
         <strong>${next.title} →</strong>
       </a>`;
   }

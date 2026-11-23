@@ -1,12 +1,12 @@
 /* ===== 토큰 ===== */
 :root {
-  --bg: #1c1c1f;
-  --bg-2: #26262a;
-  --stripe: #2c2c31;
-  --fg: #f2f2f2;
-  --fg-dim: #a3a3aa;
-  --accent: #3dff8e;
-  --line: #38383e;
+  --bg: #fafafa;
+  --bg-2: #f0f0f2;
+  --stripe: #e6e6ea;
+  --fg: #111111;
+  --fg-dim: #5f5f66;
+  --accent: #0b874b;
+  --line: #dcdce0;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,12 +18,29 @@ body {
   color: var(--fg);
   font-family: "Pretendard Variable", Pretendard, sans-serif;
   line-height: 1.6;
+  word-break: keep-all;
 }
 
-.mono { font-family: inherit; }
 .accent { color: var(--accent); }
 
 a { color: inherit; text-decoration: none; }
+
+.btn {
+  display: inline-block;
+  padding: 11px 20px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn-line { color: var(--fg); background: transparent; border-color: var(--line); }
+.btn-line:hover { border-color: var(--fg); filter: none; }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
 
 /* ===== 상단 바 ===== */
 .topbar {
@@ -33,87 +50,58 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   gap: 32px;
-  padding: 16px 24px;
-  background: rgba(28, 28, 31, 0.92);
+  padding: 14px 24px;
+  background: rgba(250, 250, 250, 0.92);
   border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
-
-.logo { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
-
+.logo { font-size: 17px; font-weight: 800; }
 .nav { display: flex; gap: 24px; font-size: 14px; color: var(--fg-dim); }
-.nav a:hover { color: var(--accent); }
+.nav a:hover { color: var(--fg); }
+.topbar .btn { margin-left: auto; }
 
-.play-toggle {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  font-size: 12px;
-  letter-spacing: 1px;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid var(--accent);
-  border-radius: 2px;
-  cursor: pointer;
-}
-.play-toggle .dot {
-  width: 6px; height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: blink 1.4s steps(1) infinite;
-}
-.play-toggle:hover { background: var(--accent); color: var(--bg); }
-.play-toggle:hover .dot { background: var(--bg); }
-
-@keyframes blink { 50% { opacity: 0; } }
-
-/* 모바일: 게임 모드 없음 */
 @media (max-width: 767px) {
-  .play-toggle { display: none; }
-  .nav { gap: 14px; font-size: 13px; }
+  .topbar .nav { display: none; }
 }
 
 /* ===== Hero ===== */
 .hero {
   max-width: 920px;
   margin: 0 auto;
-  padding: 140px 24px 120px;
+  padding: 120px 24px 104px;
 }
-.hero-pre { font-size: 14px; margin-bottom: 12px; }
+.hero-role { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 16px; }
 .hero-title {
-  font-size: clamp(56px, 11vw, 120px);
+  font-size: clamp(34px, 6vw, 56px);
   font-weight: 800;
-  letter-spacing: -2px;
-  line-height: 1;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 .hero-sub { margin-top: 20px; font-size: 18px; color: var(--fg-dim); }
-.hero-hint { margin-top: 48px; font-size: 12px; color: var(--fg-dim); }
-@media (max-width: 767px) { .hero-hint { display: none; } }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 36px; }
 
 /* ===== 섹션 공통 ===== */
 .section {
   max-width: 920px;
   margin: 0 auto;
-  padding: 72px 24px;
+  padding: 80px 24px;
   border-top: 1px solid var(--line);
 }
 .section-title {
-  font-size: 14px;
-  letter-spacing: 3px;
-  margin-bottom: 40px;
-  color: var(--fg-dim);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 32px;
 }
 
 /* ===== Projects ===== */
-.project-list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.project-list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 
 .project {
   display: flex;
   gap: 24px;
   padding: 24px;
-  background: var(--bg);
+  background: #fff;
   transition: background 0.1s;
 }
 .project:hover { background: var(--bg-2); }
@@ -259,17 +247,6 @@ a { color: inherit; text-decoration: none; }
   font-size: 14px;
   color: var(--fg-dim);
 }
-.btn {
-  padding: 9px 18px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--bg);
-  background: var(--accent);
-  border: 0;
-  border-radius: 2px;
-  cursor: pointer;
-}
 
 .page {
   container-type: inline-size;
@@ -294,7 +271,7 @@ a { color: inherit; text-decoration: none; }
 }
 .pg-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .page .dim { color: var(--fg-dim); }
-.page .img-slot img { object-fit: contain; background: #111113; }
+.page .img-slot img { object-fit: contain; background: var(--bg-2); }
 
 .pg-h { font-size: max(17px, 1.9cqw); font-weight: 700; margin-bottom: 1.6cqw; }
 .pg-lead { margin-top: 1.2cqw; font-size: max(15px, 1.6cqw); color: var(--fg-dim); line-height: 1.6; }
@@ -373,41 +350,3 @@ a { color: inherit; text-decoration: none; }
   .deck { padding: 0; gap: 0; }
   .page { width: 297mm; height: 210mm; aspect-ratio: auto; border: 0; break-after: page; }
 }
-
-/* ===== 게임 모드 ===== */
-.game-mode {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: var(--bg);
-}
-#gameCanvas { display: block; width: 100%; height: 100%; }
-
-.game-hud {
-  position: absolute;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 24px;
-  font-size: 12px;
-  color: var(--fg-dim);
-  padding: 8px 16px;
-  border: 1px solid var(--line);
-  background: rgba(28, 28, 31, 0.85);
-}
-
-.game-panel {
-  position: absolute;
-  left: 50%;
-  bottom: 60px;
-  transform: translateX(-50%);
-  width: min(520px, 90vw);
-  padding: 24px;
-  background: rgba(28, 28, 31, 0.95);
-  border: 1px solid var(--accent);
-}
-.game-panel h3 { font-size: 16px; color: var(--accent); margin-bottom: 10px; }
-.game-panel p { font-size: 13px; color: var(--fg); }
-.game-panel a { color: var(--accent); border-bottom: 1px solid var(--accent); }
-.panel-close { margin-top: 16px; font-size: 11px; color: var(--fg-dim); }
