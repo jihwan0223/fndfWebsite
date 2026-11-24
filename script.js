@@ -15,11 +15,11 @@ document.getElementById('projectList').innerHTML = PROJECTS.map((p) => `
 document.getElementById('skillList').innerHTML = PROFILE.skills.map(([g, items]) => `
   <div class="skill-row"><dt>${g}</dt><dd>${chipList(items)}</dd></div>`).join('');
 
-document.getElementById('awardList').innerHTML = PROFILE.awards.map((a) => `
-  <li class="history-row">
-    <span class="history-date">${a.date}</span>
-    <div class="history-body"><h3 class="history-name">${a.name}</h3><p class="history-desc">${a.desc}</p></div>
-  </li>`).join('');
+document.getElementById('historyList').innerHTML = PROFILE.history.map(([title, items]) => `
+  <article class="card">
+    <h2 class="card-title">${title}</h2>
+    <ol class="history">${items.map(historyRow).join('')}</ol>
+  </article>`).join('');
 
 // ===== 움직임: GSAP + ScrollTrigger(스크롤 연출), Lenis(부드러운 스크롤) =====
 // CDN을 못 불러오거나 '동작 줄이기'를 켠 사람은 연출 없이 처음부터 다 보임
@@ -50,8 +50,8 @@ if (window.gsap && window.ScrollTrigger) {
     gsap.from(['.profile-photo', '.hero-role', '.hero-title', '.hero-sub', '.about-text', '.intro-contact'],
       { y: 28, opacity: 0, duration: 0.9, ease, stagger: 0.08 });
 
-    // 기술 스택 · 수상 카드, 섹션 제목: 화면에 들어올 때
-    gsap.utils.toArray('.intro-grid .card, .section-title').forEach((el) => {
+    // 이력 카드, 기술 스택 카드, 섹션 제목: 화면에 들어올 때
+    gsap.utils.toArray('.intro-grid .card, .skills-card, .section-title').forEach((el) => {
       gsap.from(el, { y: 36, opacity: 0, duration: 0.9, ease, scrollTrigger: { trigger: el, start: 'top 88%' } });
     });
 

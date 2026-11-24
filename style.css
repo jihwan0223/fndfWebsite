@@ -101,8 +101,10 @@ a { color: inherit; text-decoration: none; }
 .intro-contact a { border-bottom: 1px solid var(--line); }
 .intro-contact a:hover { color: var(--accent); border-color: var(--accent); }
 
-/* 기술 스택 · 수상/경력 카드 */
-.intro-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; }
+/* 이력 카드 3개 (경력 · 학력 / 산학 프로젝트 / 대외활동) */
+.intro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+.history-todo { opacity: 0.45; }
+.anchor { display: block; scroll-margin-top: 80px; }
 .card {
   padding: 28px;
   background: #fff;

@@ -347,10 +347,26 @@ const PROFILE = {
     ['플랫폼', ['PC', '모바일', '세이프 에어리어 대응']],
     ['툴', ['Git', 'GitHub', 'Plastic SCM', 'VS Code']],
   ],
-  awards: [
-    { date: '2026', name: '시니어 인지기능 향상 해커톤 — 우수상', desc: '(주)에이아이씨유 주최 · 출품작 Senior Party' },
+  // 이력: [제목, 항목들]. todo: true 인 항목은 흐리게 보이는 자리표시 — 실제 내용으로 바꾸고 todo를 지우면 됨
+  history: [
+    ['경력 · 학력', [
+      { date: '20XX.03 ~ 현재', name: 'OO대학교 OO학과', desc: '재학 / 졸업 예정 등', todo: true },
+    ]],
+    ['산학 프로젝트', [
+      { date: '20XX', name: '프로젝트 이름', desc: '함께한 기업 · 맡은 역할', todo: true },
+    ]],
+    ['대외활동', [
+      { date: '2026', name: '시니어 인지기능 향상 해커톤 — 우수상', desc: '(주)에이아이씨유 주최 · 출품작 Senior Party' },
+    ]],
   ],
 };
+
+// 이력 한 항목 (메인 페이지 타임라인)
+const historyRow = (h) => `
+  <li class="history-row${h.todo ? ' history-todo' : ''}">
+    <span class="history-date">${h.date}</span>
+    <div class="history-body"><h3 class="history-name">${h.name}</h3><p class="history-desc">${h.desc}</p></div>
+  </li>`;
 
 // 이미지가 없으면 넣어야 할 경로를 적은 빈칸으로 바꿔 보여줌
 function imgSlot(id, file, alt, cls = '') {
@@ -386,10 +402,9 @@ function buildDeck() {
           <dl class="pg-skills">${PROFILE.skills.map(([g, items]) => `<div><dt>${g}</dt><dd>${chipList(items)}</dd></div>`).join('')}</dl>
         </div>
         <div class="pg-col">
-          <h2 class="pg-h">수상</h2>
-          ${PROFILE.awards.map((a) => `<div class="pg-award"><p class="accent">${a.date}</p><p class="pg-award-name">${a.name}</p><p class="dim">${a.desc}</p></div>`).join('')}
-          <h2 class="pg-h">프로젝트</h2>
-          <ol class="pg-index">${PROJECTS.map((p) => `<li>${p.title}</li>`).join('')}</ol>
+          ${PROFILE.history.map(([title, items]) => `
+            <h2 class="pg-h">${title}</h2>
+            ${items.map((a) => `<div class="pg-award${a.todo ? ' history-todo' : ''}"><p class="accent">${a.date}</p><p class="pg-award-name">${a.name}</p><p class="dim">${a.desc}</p></div>`).join('')}`).join('')}
         </div>
       </div>`,
   }];

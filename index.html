@@ -19,14 +19,14 @@
   <a class="logo" href="#about">정지환</a>
   <nav class="nav">
     <a href="#about">소개</a>
+    <a href="#history">이력</a>
     <a href="#skills">기술 스택</a>
-    <a href="#history">수상 · 경력</a>
     <a href="#projects">프로젝트</a>
   </nav>
 </header>
 
 <main>
-  <!-- 자기소개: 인사 · 소개 · 연락처 + 기술 스택 · 수상/경력 -->
+  <!-- 자기소개: 인사 · 소개 · 연락처 + 이력 → 기술 스택 → 프로젝트 -->
   <section class="intro" id="about">
     <div class="intro-head">
       <div class="intro-id">
@@ -51,16 +51,14 @@
       </div>
     </div>
 
-    <div class="intro-grid">
-      <article class="card" id="skills">
-        <h2 class="card-title">기술 스택</h2>
-        <dl class="skills" id="skillList"></dl>
-      </article>
-      <article class="card" id="history">
-        <h2 class="card-title">수상 · 경력</h2>
-        <ol class="history" id="awardList"></ol>
-      </article>
-    </div>
+    <!-- 이력: 경력 · 학력 / 산학 프로젝트 / 대외활동 (projects.js PROFILE.history 에서 채움) -->
+    <span id="history" class="anchor"></span>
+    <div class="intro-grid" id="historyList"></div>
+  </section>
+
+  <section class="section" id="skills">
+    <h2 class="section-title">기술 스택</h2>
+    <div class="card skills-card"><dl class="skills" id="skillList"></dl></div>
   </section>
 
   <section class="section" id="projects">
