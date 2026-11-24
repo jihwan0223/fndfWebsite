@@ -70,7 +70,7 @@ const PROJECTS = [
     flow: [
       { src: '01.png', caption: '왁스 부수기', desc: '클릭으로 왁스를 깨고 파편을 모아 재화 획득' },
       { src: '02.png', caption: '업그레이드 트리', desc: '재화로 공격력·자동 수집·구역 해금 강화' },
-      { src: '03.png', caption: '보스 도전', desc: '구역 끝 보스를 부수고 다음 구역으로' },
+      { src: '03.png', caption: '환생 · 별조각 트리', desc: '환생으로 얻은 별조각으로 영구 강화를 찍어 다음 회차를 더 빠르게' },
     ],
     arch: {
       rows: [
