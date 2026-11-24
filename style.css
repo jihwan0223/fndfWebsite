@@ -12,6 +12,10 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+/* Lenis(부드러운 스크롤)가 켜지면 브라우저 기본 부드러운 스크롤은 끔 - 둘이 겹치면 버벅임 */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
 
 body {
   background: var(--bg);
@@ -74,6 +78,13 @@ a { color: inherit; text-decoration: none; }
   align-items: end;
   padding-bottom: 48px;
 }
+.intro-id { display: flex; align-items: center; gap: 28px; }
+.img-slot.profile-photo { flex: 0 0 132px; aspect-ratio: 3 / 4; border-radius: 12px; }
+.profile-photo:not(:has(img))::after { font-size: 10px; padding: 8px; word-break: break-all; }
+@media (max-width: 600px) {
+  .intro-id { gap: 18px; }
+  .img-slot.profile-photo { flex-basis: 92px; }
+}
 .hero-role { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 14px; }
 .hero-title {
   font-size: clamp(36px, 5.6vw, 60px);
@@ -129,13 +140,16 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ===== Projects ===== */
-.project-list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+/* 카드마다 따로 떨어뜨림 - 스크롤로 하나씩 나타날 때 빈자리가 자연스럽게 보이도록 */
+.project-list { display: flex; flex-direction: column; gap: 16px; }
 
 .project {
   display: flex;
   gap: 24px;
   padding: 24px;
   background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
   transition: background 0.1s;
 }
 .project:hover { background: var(--bg-2); }
@@ -308,6 +322,8 @@ a { color: inherit; text-decoration: none; }
 
 /* 1장: 프로필 */
 .pg-cols { flex: 1; display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 3.6cqw; }
+.pg-photo { width: 11cqw; aspect-ratio: 3 / 4; border-radius: 8px; margin-bottom: 2cqw; }
+.page .pg-photo img { object-fit: cover; }
 .pg-kicker { font-size: max(13px, 1.3cqw); color: var(--accent); }
 .pg-name { font-size: max(40px, 6.4cqw); font-weight: 800; line-height: 1; letter-spacing: -0.02em; margin-top: 0.6cqw; }
 .pg-contact { margin-top: 3cqw; display: flex; flex-direction: column; gap: 1.2cqw; }

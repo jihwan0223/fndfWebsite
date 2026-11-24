@@ -29,9 +29,14 @@
   <!-- 자기소개: 인사 · 소개 · 연락처 + 기술 스택 · 수상/경력 -->
   <section class="intro" id="about">
     <div class="intro-head">
-      <div>
-        <p class="hero-role">게임 개발자</p>
-        <h1 class="hero-title">안녕하세요,<br>정지환입니다.</h1>
+      <div class="intro-id">
+        <div class="img-slot profile-photo" data-path="images/profile/photo.jpg">
+          <img src="images/profile/photo.jpg" alt="정지환 사진" onerror="this.remove()">
+        </div>
+        <div>
+          <p class="hero-role">게임 개발자</p>
+          <h1 class="hero-title">안녕하세요,<br>정지환입니다.</h1>
+        </div>
       </div>
       <div>
         <p class="hero-sub">플레이어가 기억할 순간을 만드는 게임을 만듭니다.</p>
@@ -67,6 +72,10 @@
   <footer class="footer">© 2026 정지환</footer>
 </main>
 
+<!-- 스크롤 연출 (GSAP + ScrollTrigger), 부드러운 스크롤 (Lenis) - 못 불러와도 페이지는 그대로 보임 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="projects.js"></script>
 <script src="script.js"></script>
 </body>

@@ -372,6 +372,7 @@ function buildDeck() {
     body: `
       <div class="pg-cols">
         <div class="pg-col">
+          ${imgSlot('profile', 'photo.jpg', `${PROFILE.name} 사진`, 'pg-photo')}
           <p class="pg-kicker">${PROFILE.role}</p>
           <h1 class="pg-name">${PROFILE.name}</h1>
           <p class="pg-lead">${PROFILE.tagline}</p>
