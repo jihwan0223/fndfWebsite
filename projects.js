@@ -1,6 +1,9 @@
 // 포트폴리오 데이터 — 메인 페이지, 프로젝트 상세, PDF가 전부 여기서 읽음.
 // 배열 순서 = 화면 순서 (가장 자신 있는 프로젝트를 맨 앞에).
 // 이미지는 images/<id>/ 폴더에 넣으면 자동으로 뜸. 없으면 파일명이 적힌 빈칸으로 표시.
+
+// 새로고침하면 보던 자리 대신 맨 위에서 시작 (모든 페이지가 이 파일을 읽음)
+history.scrollRestoration = 'manual';
 const PROJECTS = [
   {
     id: 'seniorparty',
@@ -9,6 +12,7 @@ const PROJECTS = [
     award: '2026 시니어 인지기능 향상 해커톤 우수상',
     tags: ['Unity', 'C#', 'UI Toolkit', '모바일', 'Plastic SCM'],
     github: 'https://github.com/jihwan0223/SeniorParty',
+    portrait: true, // 세로 화면 게임 - 이미지 칸을 세로 비율로
     meta: {
       기간: '2026.09 ~ 2026.10 (약 1개월)',
       인원: '3명',
@@ -513,7 +517,7 @@ function renderDeck(filter) {
   return deck.map((pg, i) => ({ pg, no: i + 1 }))
     .filter(({ pg }) => !filter || filter(pg))
     .map(({ pg, no }) => `
-      <section class="page">
+      <section class="page${pg.project?.portrait ? ' portrait' : ''}">
         <header class="pg-head"><span>${pg.label}</span><span>${String(no).padStart(2, '0')} / ${deck.length}</span></header>
         <div class="pg-body">${pg.body}</div>
       </section>`).join('');

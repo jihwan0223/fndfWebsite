@@ -25,6 +25,7 @@ document.getElementById('historyList').innerHTML = PROFILE.history.map(([title, 
 // CDN을 못 불러오거나 '동작 줄이기'를 켠 사람은 연출 없이 처음부터 다 보임
 if (window.gsap && window.ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.clearScrollMemory('manual'); // ScrollTrigger도 보던 자리를 기억해 되돌리므로 끔 (새로고침 = 맨 위)
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     const ease = 'power3.out';
 
