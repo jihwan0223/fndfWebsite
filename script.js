@@ -14,7 +14,10 @@ document.getElementById('projectList').innerHTML = PROJECTS.map((p) => `
   </a>`).join('');
 
 document.getElementById('skillList').innerHTML = PROFILE.skills.map(([g, items]) => `
-  <div class="skill-row"><dt>${g}</dt><dd>${chipList(items)}</dd></div>`).join('');
+  <div class="skill-tile">
+    <dt>${skillIcon(g)}${g}</dt>
+    <dd>${chipList(items)}</dd>
+  </div>`).join('');
 
 document.getElementById('historyList').innerHTML = PROFILE.history.map(([title, items]) => `
   <div class="cv-group">

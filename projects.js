@@ -135,50 +135,50 @@ const PROJECTS = [
   {
     id: 'catchmind',
     title: 'CatchMind',
-    headline: '**손가락으로 그리는** 그림 퀴즈 — 방장이 나가도 **판이 이어지는** 4인 멀티플레이', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '웹캠 손 인식으로 그림을 그리고 맞히는 온라인 멀티플레이 그림 퀴즈 게임.',
+    headline: '**서버 권한 구조**로 진행 · 판정 · 점수를 방장 한 곳에서 — 방장이 나가도 **판이 이어지는** 멀티플레이', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
+    tagline: '웹캠 손 인식으로 그림을 그리고 맞히는 온라인 멀티플레이 그림 퀴즈 게임 — 서버 · 네트워크 담당.',
     intent: '마우스 대신 손가락으로 허공에 그림을 그리며 친구들과 함께 노는 그림 퀴즈.',
-    tags: ['Unity', 'C#', 'Photon Fusion', 'Photon Voice', 'MediaPipe 손 인식', 'Plastic SCM'],
+    tags: ['Unity', 'C#', 'Photon Fusion (Shared)', 'Photon Voice', 'RPC · 상태 동기화', 'Plastic SCM'],
     meta: {
       구분: '산학 캡스톤 프로젝트',
       기간: '2026.11 ~ 진행 중',
       인원: '4명',
-      역할: '캐치마인드 전체 — 멀티플레이 (로비 · 방 · 게임 진행), 손 그리기, 음성 채팅, 웹캠 선택 (팀 내 최다 커밋)',
+      역할: '서버 · 네트워크 전체 — 방 생성 · 매칭, 방장 권한 게임 진행 · 정답 판정, 상태 동기화, 방장 교체 복구, 음성 채팅 (팀 내 최다 커밋)',
       플랫폼: 'PC',
     },
     flow: [
-      { src: '01.png', caption: '로비', desc: '**방 목록** · 방 만들기 · 비밀번호 · **빠른 입장**' },
-      { src: '02.png', caption: '손으로 그리기', desc: '**검지**를 펴면 그리고, **손바닥**을 펴고 있으면 전체 지우기' },
-      { src: '03.png', caption: '정답 맞히기', desc: '채팅으로 정답 입력 — **빨리 맞힐수록 높은 점수**' },
+      { src: '01.png', caption: '방 찾기 · 입장', desc: '로비 **방 목록 실시간 갱신** · 비밀번호 방 · **빠른 입장** (사람 많은 방 우선)' },
+      { src: '02.png', caption: '그림 동기화', desc: '출제자 획을 **4바이트 점 묶음**으로 모아 전송 — 늦게 온 사람에겐 **기록 재전송**' },
+      { src: '03.png', caption: '서버 판정', desc: '정답 채팅은 **방장에게만** 전송 → 방장이 판정 · 점수 → **결과만 모두에게**' },
     ],
     arch: {
       rows: [
-        ['입력', [['MediaPipe 손 인식', 'HandLandmarkerRunner · HandGestureDetector (팀원)'], ['CatchMindPen', '검지 = 펜, 손바닥 유지 = 지우기, 마우스 겸용', true], ['웹캠 선택', '실패하면 원래 웹캠으로 복구', true]], '손가락 좌표 → 펜 입력'],
-        ['그림', [['CatchMindBoard', '점 묶음(byte[]) → 텍스처, 실행 취소 · 다시 실행', true], ['획 기록', '모두가 보관 · 늦게 들어온 사람에게 재전송', true]], '획을 RPC로 전송'],
-        ['네트워크', [['CatchMindLauncher', '로비 · 방 목록 · 방 만들기 · 빠른 입장 · 비밀번호', true], ['CatchMindGame', '방장 권한으로 진행 · 정답 판정 · 점수', true], ['CatchMindVoice', 'Photon Voice 음성 채팅', true]], '점수 · 차례 동기화 → 화면 표시'],
-        ['UI', [['CatchMindUI', '1920×1080 기준 IMGUI, 화면 크기에 맞춰 확대', true]]],
+        ['클라이언트', [['CatchMindPen · Board', '손 · 마우스 입력 → 그림판 텍스처', true], ['MediaPipe 손 인식', '팀원 담당'], ['CatchMindUI', 'IMGUI 화면', true]], '획 · 채팅 · 선택을 RPC로 요청'],
+        ['서버 역할 (방장)', [['CatchMindGame', '**State Authority** — 단계 · 타이머 · 정답 판정 · 점수', true], ['입력 검증', '단계 · 보낸 사람 · 길이 검사 후에만 반영', true], ['제시어 보호', '제시어는 **출제자에게만** 타깃 RPC', true]], '[Networked] 상태 + 결과 RPC로 배포'],
+        ['공유 상태', [['[Networked] 상태', '단계 · 출제자 · TickTimer · 점수 · 출제 순서', true], ['획 기록', '전원 보관 → 방장 교체 · 늦은 입장 복구', true]], '세션 위에서 동작'],
+        ['세션 · 음성', [['CatchMindLauncher', '로비 · 방 목록 · 비밀번호(해시) · 빠른 입장', true], ['CatchMindVoice', 'Photon Voice · 누르고 말하기', true], ['Photon Cloud', 'Shared 모드 릴레이']]],
       ],
       points: [
-        ['방장 권한 구조 (Shared 모드)', '**방장이 진행 · 판정**, 점수 · 순서는 **[Networked] 동기화**'],
-        ['그림은 압축한 점 묶음으로', '점 1개 = ushort x · y **4바이트**, RPC로 **묶어 전송**'],
-        ['손 인식 끊김 보정', '인식이 잠깐 끊겨도 **획을 이어 그림**'],
+        ['방장 = 서버 (State Authority)', '진행 · 판정은 **방장 한 곳에서만**, 클라이언트는 **요청만**'],
+        ['답 유출 · 치트 방지', '제시어는 **출제자에게만** 전송, 답 흘리는 채팅은 **서버에서 차단**'],
+        ['트래픽 줄이기', '점 1개 = **4바이트**, 일정 간격으로 **묶어 전송** · 기록은 **청크로 나눠** 재전송'],
       ],
     },
     troubles: [
       {
-        title: '방장이 나가면 게임이 멈추는 문제',
-        problem: '방장 이탈 시 판이 **끝나거나 멈춤**',
-        cause: '제시어 · 맞힌 순서 · 획 기록을 **옛 방장만 보관**',
-        solution: '맞힌 순서 **[Networked] 공유** · 획 기록 **전원 보관** · 새 방장이 **RPC로 제시어 재요청**',
-        result: '방장이 바뀌어도 **판이 이어짐**',
+        title: '방장(서버 역할)이 나가면 게임이 멈추는 문제',
+        problem: '방장이 나가면 판이 **끝나거나 멈춤**',
+        cause: '제시어 · 맞힌 순서 · 획 기록을 **옛 방장 메모리에만** 보관',
+        solution: '맞힌 순서는 **[Networked] 상태**로 · 획 기록은 **전원 보관** · 새 방장이 출제자에게 **RPC로 제시어 재요청**',
+        result: '방장이 바뀌어도 **판이 그대로 이어짐**',
         img: 'trouble-1.png',
       },
       {
-        title: '웹캠을 연달아 바꾸면 손 인식이 멈추는 문제',
-        problem: '웹캠을 **빠르게 바꾸거나** 안 켜지는 웹캠을 고르면 **멈춤**',
-        cause: '**전환 중 재전환** + 안 켜진 웹캠은 **2000프레임 뒤 예외**',
-        solution: '전환 중 **버튼 잠금** · **3초** 안에 영상 없으면 **원래 웹캠으로 복구**',
-        result: '어떤 웹캠을 골라도 **안 멈춤**',
+        title: '사라진 방에 들어가면 빈 방이 새로 생기는 문제',
+        problem: '목록에서 고른 방이 그새 닫히면 **같은 이름의 빈 방**이 생김',
+        cause: 'Shared 모드는 입장할 세션이 없으면 **새로 만들어 버림**',
+        solution: '입장 직후 **내가 방장이면 = 새로 만든 방** → 바로 종료 후 로비 복귀 · 안내',
+        result: '**유령 방 생성 없음**',
         img: 'trouble-2.png',
       },
       {
@@ -378,7 +378,7 @@ const PROFILE = {
       { date: '재학 중', name: '경북소프트웨어마이스터고등학교', desc: '게임개발과' },
     ]],
     ['산학 프로젝트', [
-      { date: '2026.11 ~ 진행 중', name: 'CatchMind — 캡스톤 프로젝트', desc: '4인 팀 · 웹캠 손 인식 멀티플레이 그림 퀴즈 · 멀티플레이 · 손 그리기 · 음성 채팅 담당' },
+      { date: '2026.11 ~ 진행 중', name: 'CatchMind — 캡스톤 프로젝트', desc: '4인 팀 · 웹캠 손 인식 멀티플레이 그림 퀴즈 · 서버 · 네트워크 담당' },
     ]],
     ['대외활동', [
       { date: '2026', name: '시니어 인지기능 향상 해커톤 — 우수상', desc: '(주)에이아이씨유 주최 · 출품작 Senior Party' },
@@ -404,6 +404,20 @@ function imgSlot(id, file, alt, cls = '') {
     `</div>`;
 }
 
+// 기술 스택 분류 아이콘 (Lucide, ISC 라이선스) — 분류 이름으로 찾음, 없으면 아이콘 없이 표시
+const SKILL_ICONS = {
+  엔진: '<path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"/><path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26A4 4 0 0 0 17.32 5z"/>',
+  언어: '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
+  데이터: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  최적화: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  네트워크: '<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/>',
+  AI: '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.13-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.13a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.13 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.13a.5.5 0 0 1-.96 0z"/>',
+  서버: '<rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01M6 18h.01"/>',
+  플랫폼: '<path d="M18 8V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8M10 19v-4M7 19h5"/><rect width="6" height="10" x="16" y="12" rx="2"/>',
+  툴: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>',
+};
+const skillIcon = (g) => SKILL_ICONS[g] ? `<svg class="skill-icon" viewBox="0 0 24 24" aria-hidden="true">${SKILL_ICONS[g]}</svg>` : '';
+
 const tagList = (tags) => `<div class="tags">${tags.map((t) => `<span>${t}</span>`).join('')}</div>`;
 const chipList = (items) => `<div class="chips">${items.map((t) => `<span>${t}</span>`).join('')}</div>`;
 
@@ -427,7 +441,7 @@ function buildDeck() {
         </div>
         <div class="pg-col">
           <h2 class="pg-h">기술 스택</h2>
-          <dl class="pg-skills">${PROFILE.skills.map(([g, items]) => `<div><dt>${g}</dt><dd>${chipList(items)}</dd></div>`).join('')}</dl>
+          <dl class="pg-skills">${PROFILE.skills.map(([g, items]) => `<div><dt>${skillIcon(g)}${g}</dt><dd>${chipList(items)}</dd></div>`).join('')}</dl>
         </div>
         <div class="pg-col">
           ${PROFILE.history.map(([title, items]) => `
@@ -494,7 +508,7 @@ function buildDeck() {
             <div class="arch-row">
               <p class="arch-label"><small>${r + 1}</small>${label}</p>
               <div class="arch-boxes">${boxes.map(([name, desc, mine]) => `
-                <div class="arch-box${mine ? ' mine' : ''}"><b>${name.replace(/([a-z])([A-Z])/g, '$1<wbr>$2')}</b><span>${desc}</span></div>`).join('')}
+                <div class="arch-box${mine ? ' mine' : ''}"><b>${name.replace(/([a-z])([A-Z])/g, '$1<wbr>$2')}</b><span>${em(desc)}</span></div>`).join('')}
               </div>
             </div>${r < p.arch.rows.length - 1 ? `
             <div class="arch-flow"><i></i>${next ? `<span>${next}</span>` : ''}</div>` : ''}`).join('')}
