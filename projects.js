@@ -8,8 +8,7 @@ const PROJECTS = [
   {
     id: 'seniorparty',
     title: 'Senior Party',
-    headline: '3명이 **1개월** 만에 **인지 훈련 미니게임 10종** 완성 — 해커톤 **우수상**', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '시니어를 위한 인지기능 향상 게임 — 10종의 인지 훈련 미니게임 수록.',
+    headline: '시니어의 **인지기능 향상**을 돕는 **인지 훈련 미니게임 10종** 모음 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
     award: '2026 시니어 인지기능 향상 해커톤 우수상',
     tags: ['Unity', 'C#', 'UI Toolkit', '모바일', 'Plastic SCM'],
     github: 'https://github.com/jihwan0223/SeniorParty',
@@ -68,8 +67,7 @@ const PROJECTS = [
   {
     id: 'breakthewaxworld',
     title: 'Break The Wax World',
-    headline: '혼자 **184커밋** · 맵 **5종** — 파편이 수천 개 쏟아져도 **오브젝트 수가 일정**한 클리커', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '왁스로 뒤덮인 오브젝트를 부수며 성장하는 도파민 클리커 게임.',
+    headline: '왁스로 뒤덮인 오브젝트를 **부수며 성장**하는 **도파민 클리커** 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
     tags: ['Unity', 'C#', 'Feel'],
     github: 'https://github.com/jihwan0223/BreakTheWaxWorrld',
     meta: { 기간: '2026.08 ~ 2026.11 (커밋 184개)', 인원: '1명 (개인 프로젝트)', 역할: '기획 · 프로그래밍 전체', 플랫폼: 'PC' },
@@ -135,8 +133,7 @@ const PROJECTS = [
   {
     id: 'catchmind',
     title: 'CatchMind',
-    headline: '**서버 권한 구조**로 진행 · 판정 · 점수를 방장 한 곳에서 — 방장이 나가도 **판이 이어지는** 멀티플레이', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '웹캠 손 인식으로 그림을 그리고 맞히는 온라인 멀티플레이 그림 퀴즈 게임 — 서버 · 네트워크 담당.',
+    headline: '**웹캠 손 인식**으로 그림을 그리고 맞히는 **온라인 멀티플레이** 그림 퀴즈 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
     intent: '마우스 대신 손가락으로 허공에 그림을 그리며 친구들과 함께 노는 그림 퀴즈.',
     tags: ['Unity', 'C#', 'Photon Fusion (Shared)', 'Photon Voice', 'RPC · 상태 동기화', 'Plastic SCM'],
     meta: {
@@ -194,8 +191,7 @@ const PROJECTS = [
   {
     id: 'gamblegame',
     title: 'Hit or Bust',
-    headline: '판의 **실제 기록**을 읽고 말하는 AI 딜러 — 승패는 코드, **대사는 xAI (Grok)**', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '블랙잭에 AI 딜러를 붙여, 매 판 상황에 맞는 대사를 하는 카드 게임.',
+    headline: '매 판 상황에 맞춰 말하는 **AI 딜러**와 겨루는 **블랙잭** 카드 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
     tags: ['Unity', 'C#', 'xAI (Grok) API', '한/영'],
     github: 'https://github.com/jihwan0223/gamblegame',
     meta: { 기간: '2026.03 ~ 2026.06 (커밋 64개)', 인원: '1명 (개인 프로젝트)', 역할: '기획 · 프로그래밍 전체', 플랫폼: 'PC' },
@@ -247,8 +243,7 @@ const PROJECTS = [
   {
     id: 'towerrior',
     title: 'Towerrior',
-    headline: '4명이 **11일** 만에 완성 — 적 · 웨이브 · 타워 전투를 맡아 **팀 내 최다 커밋**', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '웨이브마다 몰려오는 적을 타워 배치와 업그레이드로 막아내는 모바일 타워 디펜스 게임.',
+    headline: '몰려오는 적을 **타워 배치 · 업그레이드**로 막아내는 **모바일 타워 디펜스** 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
     tags: ['Unity', 'C#', '모바일', '오브젝트 풀링', 'Plastic SCM'],
     meta: {
       기간: '2026.06.29 ~ 2026.07.09 (11일)',
@@ -304,8 +299,7 @@ const PROJECTS = [
   {
     id: 'writinggrandfather',
     title: 'Writing Grandfather',
-    headline: '**3일** 해커톤 — AI 글씨 피드백을 붙이고 **API 키는 서버에만** 보관', // 무엇을 해냈는지 한 줄 (**굵게** 가능)
-    tagline: '노인과 아이들을 위한 모바일 글쓰기 연습 게임.',
+    headline: '**노인과 아이들**을 위한 **모바일 글쓰기 연습** 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
     intent: '종이에 글을 쓰는 것보다 재미있게 글쓰기를 연습할 수 있도록.',
     tags: ['Unity', 'C#', 'UI Toolkit', 'OpenAI API', 'Firebase', 'Cloud Functions'],
     github: 'https://github.com/WritingGrandfather/WritingGrandfather',
@@ -473,7 +467,6 @@ function buildDeck() {
             ${p.award ? `<p class="pg-badge">★ ${p.award}</p>` : ''}
             <h1 class="pg-title">${p.title}</h1>
             <p class="pg-headline">${em(p.headline)}</p>
-            <p class="pg-lead">${p.tagline}</p>
             ${p.intent ? `<p class="pg-intent"><b>기획 의도</b> ${p.intent}</p>` : ''}
             ${tagList(p.tags)}
             ${meta ? `<dl class="pg-meta">${meta}</dl>` : ''}

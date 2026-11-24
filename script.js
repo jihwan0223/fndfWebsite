@@ -7,9 +7,7 @@ document.getElementById('projectList').innerHTML = PROJECTS.map((p) => `
       <h3 class="project-name">${p.title}</h3>
       ${p.award ? `<p class="award">★ ${p.award}</p>` : ''}
       <p class="project-headline">${em(p.headline)}</p>
-      <p class="project-desc">${p.tagline}</p>
       ${tagList(p.tags)}
-      <p class="project-more">${p.troubles.length ? `트러블슈팅 ${p.troubles.length}건 · ` : ''}자세히 보기 →</p>
     </div>
   </a>`).join('');
 
