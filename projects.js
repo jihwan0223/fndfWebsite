@@ -72,6 +72,20 @@ const PROJECTS = [
       { src: '02.png', caption: '업그레이드 트리', desc: '파편으로 공격력 · 자동 클릭 · 새 오브젝트 해금' },
       { src: '03.png', caption: '보스 도전', desc: '제한 시간 안에 왁스 책상 부수기 — 보호막 오브젝트 등장' },
     ],
+    // 플레이 흐름 다음 장: 제목별 이미지 묶음
+    gallery: [
+      ['맵 5종', [
+        { src: 'map-1.png', caption: '책상 위' },
+        { src: 'map-2.png', caption: '길거리' },
+        { src: 'map-3.png', caption: '회사 앞' },
+        { src: 'map-4.png', caption: '바다' },
+        { src: 'map-5.png', caption: '우주' },
+      ]],
+      ['환생', [
+        { src: 'rebirth-1.png', caption: '환생 — 업그레이드 노드가 소용돌이로 빨려 들어감' },
+        { src: 'rebirth-2.png', caption: '별조각으로 찍는 영구 강화 트리' },
+      ]],
+    ],
     arch: {
       rows: [
         ['입력', [['Click', '클릭 · 자동 클릭, 데미지 · 보상 계산'], ['Health', '체력 · 부서짐 단계 · 피격 연출'], ['SpriteColliderSync', '볼록 껍질 콜라이더 재계산']]],
@@ -443,6 +457,16 @@ function buildDeck() {
             <p class="dim">${f.desc}</p>
           </li>`).join('')}
         </ol>`,
+    });
+
+    if (p.gallery) deck.push({
+      project: p,
+      label: `${p.title} · ${p.gallery.map(([title]) => title).join(' · ')}`,
+      body: p.gallery.map(([title, items]) => `
+        <h2 class="pg-h">${title}</h2>
+        <ol class="pg-gallery" style="--cols: ${items.length}">${items.map((it) => `
+          <li>${imgSlot(p.id, it.src, it.caption)}<p class="pg-cap">${it.caption}</p></li>`).join('')}
+        </ol>`).join(''),
     });
 
     if (p.arch) deck.push({
