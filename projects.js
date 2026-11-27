@@ -189,114 +189,6 @@ const PROJECTS = [
     ],
   },
   {
-    id: 'gamblegame',
-    title: 'Hit or Bust',
-    headline: '매 판 상황에 맞춰 말하는 **AI 딜러**와 겨루는 **블랙잭** 카드 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
-    tags: ['Unity', 'C#', 'xAI (Grok) API', '한/영'],
-    github: 'https://github.com/jihwan0223/gamblegame',
-    meta: { 기간: '2026.03 ~ 2026.06 (커밋 64개)', 인원: '1명 (개인 프로젝트)', 역할: '기획 · 프로그래밍 전체', 플랫폼: 'PC' },
-    flow: [
-      { src: '01.png', caption: '베팅', desc: '**판돈**을 걸고 라운드 시작' },
-      { src: '02.png', caption: '블랙잭 진행', desc: '히트·스탠드로 **21에 가깝게**' },
-      { src: '03.png', caption: 'AI 딜러 대사', desc: '카드 · 판돈 · 연승을 보고 **그 판에 맞는 한마디**' },
-    ],
-    arch: {
-      rows: [
-        ['씬', [['MainScene', '로비 · 설정 · 언어 전환'], ['GameScene', '블랙잭 라운드'], ['UpgradeScene', '스킬 트리'], ['WorkScene', '알바로 돈 벌기']], '라운드 시작'],
-        ['게임 흐름', [['GameController', '히트 · 스테이 입력'], ['GameManager', '라운드 시작 · 종료 · 다음 판'], ['DeckManager', '덱 생성 · 셔플']], '카드 분배 → 승패 판정'],
-        ['판정 · 대사', [['PlayerHand ×2', '플레이어 · 딜러 패와 점수'], ['DealerAI', '딜러 행동 · 승패 · 정산 확정'], ['DealerChatAI', '판 기록 → xAI 대사 요청 · 실패 시 기본 대사', true]], '배당 지급 → 즉시 저장'],
-        ['경제 · 저장', [['BettingManager', '베팅 · 배당 지급'], ['UpgradeManager', '스킬 트리 효과'], ['DataManager', '변경 즉시 JSON 저장']]],
-      ],
-      points: [
-        ['판정은 코드, 대사는 AI', '승패 · 정산을 **코드가 끝낸 뒤** AI엔 **사실만** 전달'],
-        ['판 기록을 프롬프트로', '카드 · 판돈 · 손익 · 연승 · **최근 대사**까지 넘겨 **반복 없는 반응**'],
-        ['실패해도 게임은 계속', '코루틴 + UnityWebRequest, **10초 타임아웃** · 실패 시 **기본 대사**'],
-      ],
-    },
-    troubles: [
-      {
-        title: 'AI가 승패를 틀리게 말하는 문제',
-        problem: '**이긴 판을 졌다고** 말함',
-        cause: '**승패 판정까지 LLM**에 맡김',
-        solution: '승패는 **코드가 확정**, AI엔 **결과 코드만** 전달',
-        result: '결과와 대사가 **항상 일치**',
-        img: 'trouble-1.png',
-      },
-      {
-        title: '한국어 대사에 다른 언어가 섞이는 문제',
-        problem: '**중국어 · 일본어**가 섞이고 대사가 **너무 김**',
-        cause: '프롬프트의 **언어 · 길이 제약**이 약함',
-        solution: '**언어별 시스템 프롬프트** + 다른 문자 금지 규칙 + **글자 수 제한**',
-        result: '**짧고 일관된** 한/영 대사',
-        img: 'trouble-2.png',
-      },
-      {
-        title: '대사가 매번 틀에 박혀 기계처럼 들리는 문제',
-        problem: '점수만 바뀐 **비슷한 문장**이 반복 — 짜인 알고리즘처럼 들림',
-        cause: '점수 두 개 + 결과만 전달, AI가 **예시 문장 틀**을 그대로 흉내',
-        solution: '예시 문장 제거 · **판 기록 (카드 · 판돈 · 손익 · 연승)** 전달 · **최근 대사 4개 반복 금지** · 가장 극적인 순간 하나에 반응',
-        result: '판마다 **상황에 맞는 다른 대사**',
-        img: 'trouble-3.png',
-      },
-    ],
-  },
-  {
-    id: 'towerrior',
-    title: 'Towerrior',
-    headline: '몰려오는 적을 **타워 배치 · 업그레이드**로 막아내는 **모바일 타워 디펜스** 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
-    tags: ['Unity', 'C#', '모바일', '오브젝트 풀링', 'Plastic SCM'],
-    meta: {
-      기간: '2026.06.29 ~ 2026.07.09 (11일)',
-      인원: '4명',
-      역할: '적 · 웨이브 · 타워 전투 시스템, 타워 업그레이드 · 버프, 보스, 맵 3 · 4 제작, 카메라 조작 (팀 내 최다 커밋)',
-      플랫폼: '모바일 (Android)',
-    },
-    flow: [
-      { src: '01.png', caption: '타워 배치', desc: '구매 패널에서 타워를 골라 **맵에 설치**' },
-      { src: '02.png', caption: '웨이브 방어', desc: '웨이브마다 늘어나는 적을 **업그레이드**로 막기' },
-      { src: '03.png', caption: '보스 등장', desc: '등장 연출과 함께 나타나는 **보스 처치**' },
-    ],
-    arch: {
-      rows: [
-        ['코어', [['GameManager', '골드 · 체력 · 웨이브 상태'], ['StageManager', '스테이지 진행'], ['GridManager · Grid', '타워 배치 칸', true], ['CameraRigController', '드래그 · 줌 카메라', true]], '웨이브 시작 → 적 스폰'],
-        ['적', [['EnemySpawner', '웨이브 스폰 · 클리어 보상', true], ['EnemyPool', '타입별 오브젝트 풀'], ['Enemy', '경로 이동 · 피격 · 처치', true], ['Boss', 'Enemy 상속 · 보스 전용 처리', true]], '사거리 안 적을 공격'],
-        ['타워', [['TowerSpawner', '배치 · 판매 · 환불'], ['TowerManager · TowerSelectUI', '타워 선택', true], ['Tower', '추상 클래스 · Default · Buff · Gold · Slow', true], ['TowerUpgrade', '추상 클래스 · 타워별 업그레이드', true]], '골드 · 체력 변화 표시'],
-        ['UI · 기타', [['HUD', '골드 · 웨이브 · 보스 경고'], ['Save · Settings', '진행 저장 · 설정'], ['Loading', '씬 로딩 · 팁']]],
-      ],
-      points: [
-        ['상속으로 타워 · 적 확장', 'Tower · TowerUpgrade **추상 클래스**, Boss는 **Enemy 상속**'],
-        ['적은 오브젝트 풀로 재사용', '**타입별 풀**에서 꺼내고 처치되면 **반납**'],
-        ['상태는 GameManager 한 곳에서', '골드 · 체력 · 웨이브는 **GameManager만 변경**'],
-      ],
-    },
-    troubles: [
-      {
-        title: '빌드에서만 총알이 엉뚱한 적을 추적하는 문제',
-        problem: '**처치된 적**을 계속 쫓음 (**빌드에서만**)',
-        cause: '풀링된 적은 **비활성화만** 돼서 **null 검사를 통과**',
-        solution: '**null 또는 비활성**이면 **타깃 해제**',
-        result: '**정확한 대상만** 추적',
-        img: 'trouble-1.png',
-      },
-      {
-        title: '버프 타워를 없애도 버프가 남는 문제',
-        problem: '팔거나 부숴도 주변 타워 **버프 · 효과 유지**',
-        cause: '**누구에게 버프를 줬는지** 기록 안 함',
-        solution: '**버프 대상 목록** 기록 → 비활성화 시 **일괄 해제**',
-        result: '**능력치 정확** · 밸런스 유지',
-        img: 'trouble-2.png',
-      },
-      {
-        title: '적이 길을 벗어나 대각선으로 이동하는 문제',
-        problem: '새 맵에서 적이 **길을 무시하고 가로지름**',
-        cause: '맵마다 **스폰 위치를 따로 지정**해 경로와 어긋남',
-        solution: '**경로 첫 지점에서 생성** + 빈 경로 예외 처리',
-        result: '새 맵도 **경로대로 이동**',
-        img: 'trouble-3.png',
-      },
-    ],
-  },
-  {
     id: 'writinggrandfather',
     title: 'Writing Grandfather',
     headline: '**노인과 아이들**을 위한 **모바일 글쓰기 연습** 게임', // 프로젝트 한 줄 요약 (**굵게** 가능)
@@ -359,18 +251,18 @@ const PROJECTS = [
 // 프로필 — 메인 페이지 Skills/History 섹션과 PDF 첫 장이 여기서 읽음
 const PROFILE = {
   name: '정지환',
-  role: '게임 개발자',
-  tagline: '플레이어가 기억할 순간을 만드는 게임 개발자.',
+  role: '게임 서버 개발자',
+  tagline: '끊기지 않고 공정한 멀티플레이를 만드는 게임 서버 개발자.',
   email: 'jihwan5580@gmail.com',
   github: 'https://github.com/jihwan0223',
   skills: [
-    ['엔진', ['Unity 2D / 3D', 'UI Toolkit', 'Cinemachine', 'Input System', 'Feel (MMFeedbacks)']],
+    ['서버', ['Firebase Auth', 'Firestore', 'Cloud Functions (API 키 프록시)']],
+    ['네트워크', ['Photon Fusion', 'Photon Voice']],
     ['언어', ['C#']],
+    ['엔진', ['Unity 2D / 3D', 'UI Toolkit', 'Cinemachine', 'Input System', 'Feel (MMFeedbacks)']],
     ['데이터', ['JSON 세이브 / 로드', '이벤트 기반 자동 저장', '세이브 폴더 마이그레이션']],
     ['최적화', ['오브젝트 풀링', '라이트 베이킹']],
-    ['네트워크', ['Photon Fusion', 'Photon Voice']],
     ['AI', ['MCP (Unity MCP)']],
-    ['서버', ['Firebase Auth', 'Firestore', 'Cloud Functions (API 키 프록시)']],
     ['플랫폼', ['PC', '모바일', '세이프 에어리어 대응']],
     ['툴', ['Git', 'GitHub', 'Plastic SCM', 'VS Code']],
   ],
@@ -382,7 +274,7 @@ const PROFILE = {
     ['산학 프로젝트', [
       { date: '2026.11 ~ 진행 중', name: 'CatchMind — 캡스톤 프로젝트', desc: '4인 팀 · 웹캠 손 인식 멀티플레이 그림 퀴즈 · 서버 · 네트워크 담당' },
     ]],
-    ['대외활동', [
+    ['활동 · 수상', [
       { date: '2026', name: '시니어 인지기능 향상 해커톤 — 우수상', desc: '(주)에이아이씨유 주최 · 출품작 Senior Party' },
     ]],
   ],
